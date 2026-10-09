@@ -1,0 +1,1689 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Number Line Hop</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600;700&family=Nunito:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* Layout: sticker-book meadow. Chunky ink-outlined panels on a sky wash, one play column (max 920px) where the number line is the stage. */
+  :root {
+    --bg-top: #bfe8ff;
+    --bg-bottom: #f1fbff;
+    --surface: #ffffff;
+    --surface-2: #eef6fc;
+    --text: #1d2b4f;
+    --text-soft: #52628a;
+    --edge: #1d2b4f;
+    --shadow: #1d2b4f;
+    --accent: #ff7a45;
+    --accent-ink: #1d2b4f;
+    --accent-text: #c9481a;
+    --right: #138a52;
+    --left: #3f55d6;
+    --t1: #ff9fcf;
+    --t2: #ffe066;
+    --hl-ink: #1d2b4f;
+    --good: #138a52;
+    --bad: #d93b40;
+    --axis: #1d2b4f;
+    --tick-label: #3d4c72;
+    --cloud: rgba(255, 255, 255, 0.85);
+    --veil: rgba(255, 255, 255, 0.84);
+    --veil-strong: rgba(29, 43, 79, 0.55);
+    /* character art: same in both themes */
+    --char-line: #1d2b4f;
+    --fur: #ffffff;
+    --fur-pink: #ffb3cf;
+    --belly: #fff1f6;
+    --skin: #74d36b;
+    --skin-light: #d4f5b2;
+    --blush: #ff8fbd;
+    --mouth: #b3264f;
+    --tongue: #ff6f91;
+    --char-shadow: rgba(0, 0, 0, 0.16);
+    --display: "Fredoka", "Baloo 2", "Trebuchet MS", system-ui, sans-serif;
+    --body: "Nunito", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg-top: #0d1433;
+      --bg-bottom: #1c2858;
+      --surface: #1f2a58;
+      --surface-2: #172150;
+      --text: #f0f4ff;
+      --text-soft: #a9b6dc;
+      --edge: #060a1c;
+      --shadow: #060a1c;
+      --accent: #ff8a5c;
+      --accent-ink: #1d2b4f;
+      --accent-text: #ffab86;
+      --right: #3ddc91;
+      --left: #8a9dff;
+      --good: #3ddc91;
+      --bad: #ff6b70;
+      --axis: #dfe6ff;
+      --tick-label: #b8c4ea;
+      --cloud: rgba(255, 255, 255, 0.06);
+      --veil: rgba(23, 33, 80, 0.86);
+      --veil-strong: rgba(4, 7, 22, 0.7);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg-top: #0d1433;
+    --bg-bottom: #1c2858;
+    --surface: #1f2a58;
+    --surface-2: #172150;
+    --text: #f0f4ff;
+    --text-soft: #a9b6dc;
+    --edge: #060a1c;
+    --shadow: #060a1c;
+    --accent: #ff8a5c;
+    --accent-ink: #1d2b4f;
+    --accent-text: #ffab86;
+    --right: #3ddc91;
+    --left: #8a9dff;
+    --good: #3ddc91;
+    --bad: #ff6b70;
+    --axis: #dfe6ff;
+    --tick-label: #b8c4ea;
+    --cloud: rgba(255, 255, 255, 0.06);
+    --veil: rgba(23, 33, 80, 0.86);
+    --veil-strong: rgba(4, 7, 22, 0.7);
+    color-scheme: dark;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { min-height: 100%; }
+  body {
+    margin: 0;
+    background: linear-gradient(180deg, var(--bg-top), var(--bg-bottom)) fixed;
+    background-color: var(--bg-bottom);
+    color: var(--text);
+    font-family: var(--body);
+    font-weight: 600;
+    font-size: 16px;
+    padding-inline: 16px;
+    padding-block: 16px 48px;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  button { font: inherit; color: inherit; }
+  :focus-visible { outline: 3px solid var(--left); outline-offset: 3px; }
+
+  /* Drifting clouds */
+  .sky { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+  .cloud {
+    position: absolute; left: 0; width: 150px; height: 46px;
+    background: var(--cloud); border-radius: 999px;
+    animation: drift 80s linear infinite;
+  }
+  .cloud::before, .cloud::after { content: ""; position: absolute; background: inherit; border-radius: 50%; }
+  .cloud::before { width: 66px; height: 66px; left: 24px; top: -32px; }
+  .cloud::after { width: 50px; height: 50px; left: 76px; top: -22px; }
+  .cloud:nth-child(1) { top: 9%; animation-delay: -10s; }
+  .cloud:nth-child(2) { top: 38%; animation-duration: 110s; animation-delay: -70s; transform: scale(.7); }
+  .cloud:nth-child(3) { top: 70%; animation-duration: 95s; animation-delay: -40s; }
+  @keyframes drift { from { transform: translateX(-220px); } to { transform: translateX(calc(100vw + 220px)); } }
+
+  .app { position: relative; z-index: 1; max-width: 920px; margin-inline: auto; display: flex; flex-direction: column; gap: 14px; }
+  .screen { display: flex; flex-direction: column; gap: 14px; }
+
+  .card {
+    background: var(--surface);
+    border: 2.5px solid var(--edge);
+    border-radius: 22px;
+    box-shadow: 0 5px 0 var(--shadow);
+    padding: 16px;
+    min-width: 0;
+  }
+  .eyebrow {
+    font-family: var(--display); font-weight: 600; font-size: .78rem;
+    letter-spacing: .08em; text-transform: uppercase; color: var(--text-soft);
+  }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font-family: var(--display); font-weight: 600; font-size: 1.05rem;
+    padding: .55em 1.1em; min-height: 44px;
+    background: var(--surface-2); color: var(--text);
+    border: 2.5px solid var(--edge); border-radius: 14px;
+    box-shadow: 0 4px 0 var(--shadow);
+    cursor: pointer; transition: transform .08s, box-shadow .08s, background-color .2s;
+  }
+  .btn svg { width: 20px; height: 20px; flex: none; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--shadow); }
+  .btn:disabled { opacity: .45; cursor: default; transform: none; box-shadow: 0 4px 0 var(--shadow); }
+  .btn-accent { background: var(--accent); color: var(--accent-ink); }
+  .btn-small { font-size: .95rem; min-height: 40px; padding: .4em .9em; }
+  .icon-btn {
+    width: 44px; height: 44px; flex: none; display: grid; place-items: center;
+    border: 2.5px solid var(--edge); border-radius: 14px; background: var(--surface-2);
+    box-shadow: 0 3px 0 var(--shadow); cursor: pointer; color: var(--text); padding: 0;
+  }
+  .icon-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--shadow); }
+  .icon-btn svg { width: 22px; height: 22px; }
+
+  /* ---------- Top bar ---------- */
+  .topbar {
+    display: grid; grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.2fr) auto auto;
+    align-items: center; gap: 12px; padding: 10px 12px;
+  }
+  .tb-title strong { display: block; font-family: var(--display); font-size: 1.15rem; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tb-progress { min-width: 0; font-size: .85rem; color: var(--text-soft); }
+  .bar { height: 14px; border: 2px solid var(--edge); border-radius: 999px; background: var(--surface-2); overflow: hidden; margin-top: 4px; }
+  .bar i { display: block; height: 100%; width: 10%; background: var(--accent); border-right: 2px solid var(--edge); transition: width .45s cubic-bezier(.3, 1.4, .5, 1); }
+  .tb-count {
+    display: flex; align-items: center; gap: 6px; padding: 3px 12px 3px 6px;
+    font-family: var(--display); font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums;
+    background: var(--surface-2); border: 2px solid var(--edge); border-radius: 999px;
+  }
+  .tb-count svg { width: 28px; height: 28px; display: block; }
+  .bump { display: inline-block; animation: bump .45s cubic-bezier(.2, 1.8, .4, 1); }
+  @keyframes bump { 0% { transform: scale(1); } 40% { transform: scale(1.6); } 100% { transform: scale(1); } }
+  @media (max-width: 640px) {
+    .topbar { grid-template-columns: auto minmax(0, 1fr) auto auto; }
+    .tb-progress { grid-column: 1 / -1; order: 5; }
+  }
+
+  /* ---------- Home ---------- */
+  .home-hero { position: relative; text-align: center; padding: 22px 16px 16px; }
+  .home-hero h1 {
+    font-family: var(--display); font-weight: 700; margin: 0; line-height: 1;
+    font-size: clamp(2.5rem, 9vw, 4.2rem); letter-spacing: -.01em; text-wrap: balance;
+  }
+  .home-hero h1 .hop { display: inline-block; color: var(--accent); text-shadow: 0 4px 0 var(--edge); animation: titleHop 2.8s ease-in-out infinite; }
+  @keyframes titleHop { 0%, 70%, 100% { transform: translateY(0) rotate(0); } 80% { transform: translateY(-12px) rotate(-5deg); } 90% { transform: translateY(0) rotate(2deg); } }
+  .home-sub { margin: .6rem 0 0; color: var(--text-soft); font-size: 1.05rem; text-wrap: balance; }
+  .home-sound { position: absolute; top: 12px; right: 12px; }
+  .hero-svg { display: block; width: 100%; max-width: 560px; height: auto; margin: 6px auto 0; overflow: visible; }
+  .hero-caption { margin: 2px 0 0; font-size: .95rem; color: var(--text-soft); }
+  .hero-caption b { color: var(--right); }
+  .hero-caption b.neg { color: var(--left); }
+
+  .levels { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  @media (max-width: 660px) { .levels { grid-template-columns: 1fr; } }
+  .level-card { display: flex; flex-direction: column; gap: 12px; padding: 18px; }
+  .level-head { display: flex; align-items: center; gap: 12px; }
+  .level-badge {
+    width: 54px; height: 54px; flex: none; display: grid; place-items: center;
+    font-family: var(--display); font-weight: 700; font-size: 1.7rem; color: var(--hl-ink);
+    border: 2.5px solid var(--edge); border-radius: 16px; box-shadow: 0 3px 0 var(--shadow);
+  }
+  .level-card:nth-child(1) .level-badge { background: var(--t2); transform: rotate(-4deg); }
+  .level-card:nth-child(2) .level-badge { background: var(--t1); transform: rotate(4deg); }
+  .level-card h2 { font-family: var(--display); font-weight: 700; font-size: 1.4rem; line-height: 1.1; margin: 0; text-wrap: balance; }
+  .level-card p { margin: 0; line-height: 1.5; color: var(--text-soft); max-width: 60ch; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { font-size: .8rem; padding: 3px 10px; border-radius: 999px; border: 2px solid var(--edge); background: var(--surface-2); }
+  .level-foot { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: auto; }
+  .best { display: flex; align-items: center; gap: 2px; font-size: .85rem; color: var(--text-soft); }
+  .best svg { width: 24px; height: 24px; }
+  .star-on path { fill: var(--t2); stroke: var(--edge); }
+  .star-off path { fill: var(--surface-2); stroke: var(--text-soft); }
+  .teacher-note { text-align: center; color: var(--text-soft); font-size: .9rem; margin: 2px 0 0; line-height: 1.5; text-wrap: balance; }
+
+  /* ---------- Prompt card + speech bubble ---------- */
+  .prompt { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 18px; align-items: center; overflow: hidden; }
+  .buddy { display: flex; align-items: center; gap: 4px; min-width: 0; }
+  .avatar { width: clamp(66px, 12vw, 92px); height: auto; flex: none; overflow: visible; }
+  .bubble {
+    position: relative; flex: 1; min-width: 0; margin: 0 0 0 14px;
+    background: var(--surface-2); border: 2.5px solid var(--edge); border-radius: 18px;
+    padding: 10px 14px; font-size: 1rem; line-height: 1.45; font-weight: 700;
+    transform-origin: left center;
+  }
+  .bubble::before, .bubble::after { content: ""; position: absolute; top: 50%; transform: translateY(-50%); border-style: solid; border-color: transparent; }
+  .bubble::before { left: -14px; border-width: 10px 14px 10px 0; border-right-color: var(--edge); }
+  .bubble::after { left: -9.5px; border-width: 7.5px 10px 7.5px 0; border-right-color: var(--surface-2); }
+  .bubble b { color: var(--accent-text); }
+  .bubble.pop { animation: pop .32s cubic-bezier(.2, 1.6, .4, 1); }
+  @keyframes pop { from { transform: scale(.9); } to { transform: scale(1); } }
+  .tagtxt { display: inline-block; font-family: var(--display); font-weight: 600; font-style: normal; color: var(--hl-ink); padding: 0 8px; border-radius: 999px; border: 2px solid var(--edge); line-height: 1.35; }
+  .tagtxt.t1 { background: var(--t1); }
+  .tagtxt.t2 { background: var(--t2); }
+
+  .target-box, .problem {
+    display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0;
+    padding: 10px 16px; border-radius: 18px; background: var(--surface-2); border: 2.5px dashed var(--edge);
+  }
+  .target-box { min-width: 10.5rem; }
+  .target-num { font-family: var(--display); font-weight: 700; font-size: clamp(3rem, 10vw, 4.6rem); line-height: 1; color: var(--accent-text); font-variant-numeric: tabular-nums; }
+  .hint-text { grid-column: 1 / -1; margin: 0; padding: 10px 14px; border-radius: 14px; background: var(--t2); color: var(--hl-ink); border: 2px solid var(--edge); line-height: 1.5; }
+  .btn-hint[aria-pressed="true"], .btn-hl[aria-pressed="true"] { background: var(--t2); color: var(--hl-ink); }
+
+  .stamp {
+    position: absolute; left: 50%; top: 50%; z-index: 3; pointer-events: none;
+    font-family: var(--display); font-weight: 700; font-size: clamp(1.6rem, 5vw, 2.4rem);
+    padding: .15em .6em; border: 4px solid currentColor; border-radius: 14px;
+    background: var(--surface); color: var(--good); opacity: 0;
+    transform: translate(-50%, -50%) rotate(-9deg) scale(0);
+  }
+  .stamp.bad { color: var(--bad); }
+  .stamp.show { animation: stamp .38s cubic-bezier(.2, 1.6, .4, 1) forwards; }
+  @keyframes stamp {
+    from { opacity: 0; transform: translate(-50%, -50%) rotate(-9deg) scale(2.3); }
+    to { opacity: 1; transform: translate(-50%, -50%) rotate(-9deg) scale(1); }
+  }
+  @media (max-width: 600px) {
+    .prompt { grid-template-columns: 1fr; }
+    .target-box, .problem { order: -1; }
+  }
+
+  /* ---------- Number line stage ---------- */
+  .stage { padding: 12px; transition: background-color .2s, box-shadow .2s; }
+  .stage.drag-over { border-style: dashed; }
+  .stage.drag-hot { background: var(--surface-2); box-shadow: 0 5px 0 var(--shadow), 0 0 0 5px var(--t2); }
+  .stage-top, .stage-foot { display: flex; justify-content: space-between; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .stage-top { margin-bottom: 4px; }
+  .stage-foot { margin-top: 6px; color: var(--text-soft); font-size: .88rem; }
+  .drop-chip { font-family: var(--display); font-weight: 500; font-size: .9rem; padding: 3px 12px; border-radius: 999px; background: var(--surface-2); border: 2px dashed var(--edge); }
+  .lane-key { font-size: .85rem; color: var(--text-soft); display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+  .scroller { overflow-x: auto; overflow-y: hidden; touch-action: pan-x; scrollbar-width: thin; }
+  .scroller svg { display: block; width: 100%; height: auto; overflow: hidden; }
+  #l1-svg { min-width: 600px; }
+  #l2-svg { min-width: 720px; }
+
+  .axis { stroke: var(--axis); stroke-width: 3.5; stroke-linecap: round; }
+  .axis-head { fill: var(--axis); }
+  .tick { stroke: var(--axis); stroke-width: 2; }
+  .tick.major { stroke-width: 2.6; }
+  .tick.zero { stroke-width: 4; }
+  .tick-label { fill: var(--tick-label); font-family: var(--display); font-size: 13px; font-weight: 500; text-anchor: middle; }
+  .tick-label.major { fill: var(--text); font-weight: 600; }
+  .tick-label.zero { fill: var(--text); font-size: 16px; font-weight: 700; }
+  .tick-label.hot { fill: var(--accent-text); font-weight: 700; font-size: 15px; }
+  #l2-svg .tick-label { font-size: 12px; }
+  #l2-svg .tick-label.major { font-size: 13px; }
+
+  .vec-shape { stroke: var(--edge); stroke-width: 1.5; stroke-linejoin: round; }
+  .vec-pos .vec-shape, .vec-pos .vec-dot { fill: var(--right); }
+  .vec-neg .vec-shape, .vec-neg .vec-dot { fill: var(--left); }
+  .vec-divider { stroke: var(--surface); stroke-width: 1.6; opacity: .8; }
+  .vec-guide { fill: none; stroke-width: 2; stroke-dasharray: 4 4; }
+  .vec-pos .vec-guide { stroke: var(--right); }
+  .vec-neg .vec-guide { stroke: var(--left); }
+  .vec-guide.faint { opacity: .55; }
+  .ring { fill: none; stroke-width: 3; transform-box: fill-box; transform-origin: center; animation: ringPulse 1.2s ease-in-out infinite; }
+  .ring.hint { stroke: var(--accent); }
+  .ring.land { stroke: var(--good); }
+  .ring.answer { stroke: var(--accent); stroke-dasharray: 5 4; }
+  .ring-dot.hint, .ring-dot.answer { fill: var(--accent); }
+  .ring-dot.land { fill: var(--good); }
+  @keyframes ringPulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.22); opacity: .6; } }
+  .count-pop { fill: var(--accent-text); font-family: var(--display); font-weight: 700; font-size: 18px; text-anchor: middle; animation: floatUp .75s ease-out forwards; }
+  @keyframes floatUp { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-22px); } }
+  .dust { fill: var(--text-soft); opacity: .55; transform-box: fill-box; transform-origin: center; animation: puff .5s ease-out forwards; }
+  @keyframes puff { to { transform: scale(2.6); opacity: 0; } }
+  .lane-tag rect { stroke: var(--edge); stroke-width: 1.5; }
+  .lane-tag.t1 rect { fill: var(--t1); }
+  .lane-tag.t2 rect { fill: var(--t2); }
+  .lane-tag text { fill: var(--hl-ink); font-family: var(--display); font-size: 11px; font-weight: 700; text-anchor: middle; }
+  .tongue { stroke: var(--tongue); stroke-width: 4; stroke-linecap: round; }
+  .fly .wing { fill: rgba(200, 230, 255, .9); stroke: var(--char-line); stroke-width: .8; transform-box: fill-box; transform-origin: 50% 100%; animation: flap .07s linear infinite alternate; }
+  .fly .fly-body { fill: #2b2f45; stroke: var(--char-line); stroke-width: .8; }
+  .fly .fly-eye { fill: #e5484d; }
+  @keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(.35); } }
+
+  /* ---------- Arrow cards ---------- */
+  .options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  @media (max-width: 640px) { .options { grid-template-columns: 1fr; } }
+  .opt-card, .l2-card {
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px;
+    min-height: 92px; padding: 12px; background: var(--surface); color: var(--text);
+    border: 2.5px solid var(--edge); border-radius: 18px; box-shadow: 0 4px 0 var(--shadow);
+    cursor: grab; touch-action: none; transition: transform .15s, opacity .2s, filter .2s;
+  }
+  .opt-card:hover, .l2-card:hover { transform: translateY(-2px) rotate(-.8deg); }
+  .opt-card.lifted, .l2-card.lifted { opacity: .4; transform: scale(.97); }
+  .opt-card.chosen { box-shadow: 0 4px 0 var(--shadow), 0 0 0 5px var(--t2); }
+  .opt-card svg { display: block; overflow: visible; }
+  .opt-label { font-family: var(--display); font-weight: 600; font-size: 1.1rem; }
+  .vec-pos .opt-label { color: var(--right); }
+  .vec-neg .opt-label { color: var(--left); }
+  .panel-title { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .panel-title span:last-child { font-size: .88rem; color: var(--text-soft); }
+  .l2-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+  @media (max-width: 720px) { .l2-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .l2-card { padding: 10px 8px; gap: 6px; }
+  .l2-card .card-arrow { width: 100%; max-width: 132px; height: auto; overflow: visible; }
+  .l2-card.dim { opacity: .38; filter: saturate(.5); }
+  .tag { font-family: var(--display); font-weight: 600; font-size: .8rem; padding: 1px 10px; border-radius: 999px; border: 2px solid var(--edge); color: var(--hl-ink); }
+  .tag.t1 { background: var(--t1); }
+  .tag.t2 { background: var(--t2); }
+  .hl-on .l2-card .tag { animation: tagGlow 1.1s ease-in-out 2; }
+  @keyframes tagGlow { 50% { transform: scale(1.18); box-shadow: 0 0 0 4px var(--surface-2); } }
+  .wiggle { animation: wiggle .45s; }
+  @keyframes wiggle { 20% { transform: rotate(-5deg); } 40% { transform: rotate(5deg); } 60% { transform: rotate(-3deg); } 80% { transform: rotate(2deg); } }
+  .drag-ghost { position: fixed; left: 0; top: 0; z-index: 90; pointer-events: none; transform: translate(-50%, -50%) rotate(-3deg); filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .3)); }
+  div.drag-ghost { width: 150px; }
+
+  /* ---------- Level 2 equation ---------- */
+  .equation {
+    font-family: var(--display); font-weight: 700; font-size: clamp(2.2rem, 7.5vw, 3.4rem);
+    line-height: 1.15; white-space: nowrap; padding-bottom: 1.15rem; font-variant-numeric: tabular-nums;
+  }
+  .term {
+    position: relative; display: inline-block; padding: 0 .14em; border-radius: .2em;
+    background-repeat: no-repeat; background-position: left center; background-size: 0% 100%;
+    transition: background-size .45s ease, color .2s;
+  }
+  .term.t1 { background-image: linear-gradient(var(--t1), var(--t1)); }
+  .term.t2 { background-image: linear-gradient(var(--t2), var(--t2)); transition-delay: .18s; }
+  .equation.hl .term { background-size: 100% 100%; color: var(--hl-ink); }
+  .implied { display: inline-block; max-width: 0; opacity: 0; overflow: hidden; vertical-align: bottom; transition: max-width .3s, opacity .3s; }
+  .equation.hl .implied { max-width: .7em; opacity: .55; }
+  .term-tag {
+    position: absolute; left: 50%; top: 100%; transform: translate(-50%, 3px);
+    font-size: .8rem; font-weight: 600; letter-spacing: 0; white-space: nowrap;
+    padding: 0 8px; border-radius: 999px; border: 2px solid var(--edge); color: var(--hl-ink);
+    opacity: 0; transition: opacity .3s .35s;
+  }
+  .t1 .term-tag { background: var(--t1); }
+  .t2 .term-tag { background: var(--t2); }
+  .equation.hl .term-tag { opacity: 1; }
+  .eq-rest { color: var(--text-soft); }
+
+  .steps { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; list-style: none; margin: 0; padding: 0; }
+  .steps li {
+    display: flex; align-items: center; gap: 7px; padding: 4px 12px 4px 4px;
+    border-radius: 999px; border: 2px solid var(--edge); background: var(--surface-2);
+    font-size: .9rem; color: var(--text-soft); transition: background-color .2s, color .2s;
+  }
+  .steps .n { width: 24px; height: 24px; flex: none; display: grid; place-items: center; border-radius: 50%; border: 2px solid var(--edge); background: var(--surface); color: var(--text); font-family: var(--display); font-size: .85rem; }
+  .steps li.active { background: var(--accent); color: var(--accent-ink); animation: nudge 1.8s ease-in-out infinite; }
+  .steps li.done { color: var(--text); }
+  .steps li.done .n { background: var(--good); color: var(--surface); }
+  @keyframes nudge { 0%, 80%, 100% { transform: translateY(0); } 90% { transform: translateY(-3px); } }
+
+  /* ---------- Keypad ---------- */
+  .keypad { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 14px; align-items: center; }
+  @media (max-width: 720px) { .keypad { grid-template-columns: 1fr; } }
+  .answer { display: flex; flex-direction: column; gap: 8px; }
+  .answer-box {
+    display: block; font-family: var(--display); font-weight: 700; font-size: 2.2rem; text-align: center;
+    padding: 4px 10px; min-height: 3.4rem; color: var(--accent-text);
+    border: 2.5px solid var(--edge); border-radius: 16px; background: var(--surface-2); font-variant-numeric: tabular-nums;
+  }
+  .keys { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; }
+  @media (max-width: 480px) { .keys { grid-template-columns: repeat(5, minmax(0, 1fr)); } .key-check { grid-column: span 2; } }
+  .key {
+    min-height: 50px; padding: 0; border: 2.5px solid var(--edge); border-radius: 14px;
+    background: var(--surface-2); color: var(--text); box-shadow: 0 4px 0 var(--shadow);
+    font-family: var(--display); font-size: 1.3rem; font-weight: 600; cursor: pointer;
+  }
+  .key:active { transform: translateY(3px); box-shadow: 0 1px 0 var(--shadow); }
+  .key-small { font-size: .9rem; }
+  .key-check { background: var(--accent); color: var(--accent-ink); font-size: 1rem; font-weight: 700; }
+  .lock {
+    position: absolute; inset: 0; z-index: 2; border-radius: 20px; padding: 12px;
+    display: flex; align-items: center; justify-content: center; gap: 10px; text-align: center;
+    background: var(--veil); font-family: var(--display); font-weight: 600; font-size: 1.05rem;
+  }
+  .lock svg { width: 26px; height: 26px; flex: none; }
+
+  /* ---------- Characters ---------- */
+  .char .shadow { fill: var(--char-shadow); }
+  .char .fur { fill: var(--fur); stroke: var(--char-line); stroke-width: 1.5; }
+  .char .pink { fill: var(--fur-pink); }
+  .char .belly { fill: var(--belly); }
+  .char .skin { fill: var(--skin); stroke: var(--char-line); stroke-width: 1.5; }
+  .char .skin-light { fill: var(--skin-light); }
+  .char .eye-white { fill: #ffffff; stroke: var(--char-line); stroke-width: 1.2; }
+  .char .pupil { fill: var(--char-line); }
+  .char .shine { fill: #ffffff; }
+  .char .blush { fill: var(--blush); opacity: .75; }
+  .char .nose { fill: #ff6f9e; }
+  .char .line { fill: none; stroke: var(--char-line); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+  .char .mouth-open { fill: var(--mouth); stroke: var(--char-line); stroke-width: 1.2; stroke-linejoin: round; }
+  .char .mouth-open .tongue-fill { fill: var(--tongue); stroke: none; }
+  .char .eye-happy, .char .eye-dizzy, .char .mouth-open, .char .mouth-sad { display: none; }
+  .char.mood-happy .eye-normal, .char.mood-happy .mouth-smile,
+  .char.mood-sad .eye-normal, .char.mood-sad .mouth-smile { display: none; }
+  .char.mood-happy .eye-happy, .char.mood-happy .mouth-open,
+  .char.mood-sad .eye-dizzy, .char.mood-sad .mouth-sad { display: inline; }
+  .char .bob { animation: bob 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+  @keyframes bob { 0%, 100% { transform: translateY(0) scale(1, 1); } 50% { transform: translateY(-1.2px) scale(1.02, .98); } }
+  .char .eye-normal { animation: blink 4.4s infinite; transform-box: fill-box; transform-origin: center; }
+  @keyframes blink { 0%, 93%, 100% { transform: scaleY(1); } 95.5% { transform: scaleY(.1); } }
+  .char-bunny .ear-l, .char-bunny .ear-r { transform-box: fill-box; transform-origin: 50% 100%; }
+  .char-bunny .ear-l { animation: earL 3.6s ease-in-out infinite; }
+  .char-bunny .ear-r { animation: earR 3.6s ease-in-out infinite .25s; }
+  @keyframes earL { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(-14deg); } 90% { transform: rotate(4deg); } }
+  @keyframes earR { 0%, 70%, 100% { transform: rotate(0); } 80% { transform: rotate(14deg); } 90% { transform: rotate(-4deg); } }
+  .char.mood-happy .bob { animation: cheer .55s ease-in-out infinite; }
+  @keyframes cheer { 0%, 50%, 100% { transform: translateY(0) rotate(0); } 25% { transform: translateY(-7px) rotate(-6deg); } 75% { transform: translateY(-7px) rotate(6deg); } }
+  .char.mood-sad .bob { animation: dizzy .6s ease-in-out 3; }
+  @keyframes dizzy { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-9deg); } 75% { transform: rotate(9deg); } }
+
+  /* ---------- Modal, toast, effects ---------- */
+  .modal { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px; background: var(--veil-strong); }
+  .modal-card { width: min(480px, 100%); max-height: calc(100vh - 32px); overflow: auto; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; animation: rise .45s cubic-bezier(.2, 1.4, .4, 1); }
+  @keyframes rise { from { transform: translateY(40px) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+  .modal-card h2 { font-family: var(--display); font-weight: 700; font-size: 2rem; margin: 0; }
+  .modal-card .avatar { width: 110px; }
+  .stars { display: flex; gap: 8px; }
+  .stars svg { width: 50px; height: 50px; }
+  .stars .star-on { animation: starPop .5s cubic-bezier(.2, 1.7, .4, 1) backwards; }
+  @keyframes starPop { from { transform: scale(0) rotate(-40deg); } to { transform: scale(1) rotate(0); } }
+  .m-score { margin: 0; font-size: 1.1rem; }
+  .m-score b { font-family: var(--display); font-size: 1.6rem; color: var(--accent-text); }
+  .m-grade { margin: 0; font-family: var(--display); font-weight: 600; font-size: 1.25rem; }
+  .review { width: 100%; max-height: 190px; overflow: auto; text-align: left; display: flex; flex-direction: column; gap: 4px; padding: 8px; border: 2px solid var(--edge); border-radius: 14px; background: var(--surface-2); font-size: .9rem; }
+  .review div { display: flex; justify-content: space-between; gap: 10px; padding: 3px 8px; border-radius: 8px; font-variant-numeric: tabular-nums; }
+  .review .ok { color: var(--good); font-weight: 800; white-space: nowrap; }
+  .review .no { color: var(--bad); font-weight: 800; white-space: nowrap; }
+  .m-actions { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin-top: 4px; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); z-index: 95;
+    max-width: calc(100% - 32px); padding: 10px 18px; border-radius: 16px;
+    background: var(--text); color: var(--surface); font-weight: 700; text-align: center;
+    transform: translate(-50%, calc(100% + 40px)); opacity: 0; pointer-events: none;
+    transition: transform .3s cubic-bezier(.2, 1.4, .4, 1), opacity .2s;
+  }
+  .toast.show { transform: translate(-50%, 0); opacity: 1; }
+  .fx { position: fixed; inset: 0; z-index: 98; pointer-events: none; overflow: hidden; }
+  .confetti { position: absolute; display: block; border: 1.5px solid var(--edge); }
+  .collect { position: absolute; width: 36px; height: 36px; margin: -18px 0 0 -18px; }
+  .collect svg { width: 100%; height: 100%; display: block; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .char *, .cloud, .bubble, .steps li, .ring, .home-hero h1 .hop, .hl-on .l2-card .tag, .bar i { animation: none !important; transition: none !important; }
+    .stamp.show { animation: none; opacity: 1; transform: translate(-50%, -50%) rotate(-9deg) scale(1); }
+  }
+</style>
+</head>
+<body>
+
+<div class="sky" aria-hidden="true"><div class="cloud"></div><div class="cloud"></div><div class="cloud"></div></div>
+
+<main class="app">
+  <header class="topbar card" id="topbar" hidden>
+    <button class="icon-btn" id="tb-home" type="button" aria-label="Back to level menu"></button>
+    <div class="tb-title"><span class="eyebrow" id="tb-level">Level 1</span><strong id="tb-name">Pip's Arrow Hop</strong></div>
+    <div class="tb-progress"><span id="tb-q">Question 1 of 10</span><div class="bar"><i id="tb-bar"></i></div></div>
+    <div class="tb-count" id="tb-count"><span id="tb-count-icon"></span><span id="tb-count-num">0</span></div>
+    <button class="icon-btn" type="button" data-sound></button>
+  </header>
+
+  <!-- ================= HOME ================= -->
+  <section class="screen" id="screen-home">
+    <div class="card home-hero">
+      <button class="icon-btn home-sound" type="button" data-sound></button>
+      <h1>Number Line <span class="hop">Hop</span></h1>
+      <p class="home-sub">Directed numbers and straight vectors with Pip the bunny and Freddie the frog</p>
+      <svg class="hero-svg" id="hero-svg" viewBox="-205 -82 410 136" role="img" aria-label="A number line from −5 to +5. Pip the bunny stands at −3 on a blue arrow pointing left. Freddie the frog stands at +3 on a green arrow pointing right."></svg>
+      <p class="hero-caption"><b>+3</b> means 3 units to the right of 0. <b class="neg">−3</b> means 3 units to the left.</p>
+    </div>
+
+    <div class="levels">
+      <article class="card level-card">
+        <div class="level-head"><span class="level-badge">1</span><h2>Pip's Arrow Hop</h2></div>
+        <p>Match each directed number with its vector. Drag the arrow that starts at 0 and ends on the target, and Pip hops along it one unit at a time.</p>
+        <div class="chips"><span class="chip">Directed numbers</span><span class="chip">Positive and negative</span><span class="chip">Vectors</span></div>
+        <div class="level-foot"><span class="best" id="best-1"></span><button class="btn btn-accent" type="button" data-start="1">Play Level 1</button></div>
+      </article>
+      <article class="card level-card">
+        <div class="level-head"><span class="level-badge">2</span><h2>Freddie's Double Jump</h2></div>
+        <p>Add and subtract directed numbers by joining two vectors head to tail. Use the highlighter to see where each term begins and ends.</p>
+        <div class="chips"><span class="chip">Addition</span><span class="chip">Subtraction</span><span class="chip">Terms</span></div>
+        <div class="level-foot"><span class="best" id="best-2"></span><button class="btn btn-accent" type="button" data-start="2">Play Level 2</button></div>
+      </article>
+    </div>
+    <p class="teacher-note">For P.4 to P.6 · 10 questions per level · Start with Level 1, then move on to Level 2</p>
+  </section>
+
+  <!-- ================= LEVEL 1 ================= -->
+  <section class="screen" id="screen-l1" hidden>
+    <div class="card prompt" id="l1-prompt">
+      <div class="buddy">
+        <svg class="avatar" viewBox="-32 -68 64 72" aria-hidden="true"><g id="l1-avatar"></g></svg>
+        <p class="bubble" id="l1-bubble" aria-live="polite"></p>
+      </div>
+      <div class="target-box">
+        <span class="eyebrow">Target directed number</span>
+        <div class="target-num" id="l1-target">+5</div>
+        <button class="btn btn-small btn-hint" type="button" id="l1-hint-btn" aria-pressed="false"></button>
+      </div>
+      <p class="hint-text" id="l1-hint" hidden></p>
+      <div class="stamp" id="l1-stamp" aria-hidden="true"></div>
+    </div>
+
+    <div class="card stage" id="l1-drop">
+      <div class="stage-top"><span class="drop-chip">Drop an arrow card here</span><span class="lane-key">Every arrow starts at 0</span></div>
+      <div class="scroller" id="l1-scroll">
+        <svg id="l1-svg" viewBox="0 0 800 178" aria-label="Number line from −10 to +10">
+          <g id="l1-axis"></g>
+          <g id="l1-rings"></g>
+          <g id="l1-vector"></g>
+          <g id="l1-fx"></g>
+          <g id="l1-bunny"></g>
+        </svg>
+      </div>
+    </div>
+
+    <div class="options" id="l1-options"></div>
+  </section>
+
+  <!-- ================= LEVEL 2 ================= -->
+  <section class="screen" id="screen-l2" hidden>
+    <div class="card prompt" id="l2-prompt">
+      <div class="buddy">
+        <svg class="avatar" viewBox="-32 -68 64 72" aria-hidden="true"><g id="l2-avatar"></g></svg>
+        <p class="bubble" id="l2-bubble" aria-live="polite"></p>
+      </div>
+      <div class="problem">
+        <span class="eyebrow">Work out</span>
+        <div class="equation" id="l2-eq"></div>
+        <button class="btn btn-small btn-hl" type="button" id="hl-btn" aria-pressed="false"></button>
+      </div>
+      <ol class="steps" id="l2-steps">
+        <li data-step="1"><span class="n">1</span>Place the <i class="tagtxt t1">Term 1</i> arrow</li>
+        <li data-step="2"><span class="n">2</span>Place the <i class="tagtxt t2">Term 2</i> arrow</li>
+        <li data-step="3"><span class="n">3</span>Type where Freddie lands</li>
+      </ol>
+      <div class="stamp" id="l2-stamp" aria-hidden="true"></div>
+    </div>
+
+    <div class="card stage" id="l2-drop">
+      <div class="stage-top"><span class="drop-chip">Drop arrow cards here</span><span class="lane-key"><i class="tagtxt t1">T1</i> lower lane <i class="tagtxt t2">T2</i> upper lane</span></div>
+      <div class="scroller" id="l2-scroll">
+        <svg id="l2-svg" viewBox="0 -50 1000 205" aria-label="Number line from −15 to +15">
+          <g id="l2-axis"></g>
+          <g id="l2-rings"></g>
+          <g id="l2-v1"></g>
+          <g id="l2-v2"></g>
+          <g id="l2-fx"></g>
+          <g id="l2-frog"></g>
+          <g id="l2-air"></g>
+        </svg>
+      </div>
+      <div class="stage-foot"><span>Number line from −15 to +15</span><button class="btn btn-small" type="button" id="l2-reset"></button></div>
+    </div>
+
+    <div class="card">
+      <div class="panel-title"><span class="eyebrow">Arrow cards</span><span>Tap a card, or drag it onto the number line</span></div>
+      <div class="l2-cards" id="l2-cards"></div>
+    </div>
+
+    <div class="card keypad" id="l2-keypad">
+      <div class="answer">
+        <span class="eyebrow">Where did Freddie land?</span>
+        <output class="answer-box" id="l2-answer" aria-live="polite">?</output>
+        <button class="btn btn-accent" type="button" id="l2-next" hidden>Next question →</button>
+      </div>
+      <div class="keys" id="l2-keys">
+        <button class="key" type="button" data-key="1">1</button>
+        <button class="key" type="button" data-key="2">2</button>
+        <button class="key" type="button" data-key="3">3</button>
+        <button class="key" type="button" data-key="4">4</button>
+        <button class="key" type="button" data-key="5">5</button>
+        <button class="key" type="button" data-key="6">6</button>
+        <button class="key" type="button" data-key="7">7</button>
+        <button class="key" type="button" data-key="8">8</button>
+        <button class="key" type="button" data-key="9">9</button>
+        <button class="key" type="button" data-key="0">0</button>
+        <button class="key" type="button" data-key="-" aria-label="Negative sign">−</button>
+        <button class="key key-small" type="button" data-key="DEL" aria-label="Delete">DEL</button>
+        <button class="key key-small" type="button" data-key="CLR" aria-label="Clear">CLR</button>
+        <button class="key key-check" type="button" data-key="CHECK">CHECK</button>
+      </div>
+      <div class="lock" id="l2-lock"><span id="lock-icon"></span>Place both arrows on the number line to unlock the keypad</div>
+    </div>
+  </section>
+</main>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="card modal-card">
+    <svg class="avatar" viewBox="-32 -68 64 72" aria-hidden="true"><g id="m-avatar"></g></svg>
+    <h2 id="m-title">Level complete!</h2>
+    <div class="stars" id="m-stars"></div>
+    <p class="m-score" id="m-score"></p>
+    <p class="m-grade" id="m-grade"></p>
+    <div class="review" id="m-review"></div>
+    <div class="m-actions">
+      <button class="btn" type="button" id="m-again">Play again</button>
+      <button class="btn btn-accent" type="button" id="m-next">Go to Level 2 →</button>
+      <button class="btn" type="button" id="m-home">Level menu</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<div class="fx" id="fx" aria-hidden="true"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ================= Helpers ================= */
+  const SVG_NS = 'http://www.w3.org/2000/svg';
+  const $ = (id) => document.getElementById(id);
+  const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+  const store = {
+    get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+    set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* storage unavailable */ } }
+  };
+  const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+  const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+  const minus = (n) => (n < 0 ? '−' + Math.abs(n) : String(n));
+  const signed = (n) => (n > 0 ? '+' + n : minus(n));
+  const units = (n) => (n === 1 ? 'unit' : 'units');
+  function shuffle(arr) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+  function svgEl(tag, attrs, parent) { const el = document.createElementNS(SVG_NS, tag); for (const k in attrs) el.setAttribute(k, attrs[k]); if (parent) parent.appendChild(el); return el; }
+  function animate(duration, frame) {
+    return new Promise((resolve) => {
+      if (duration <= 0) { frame(1); resolve(); return; }
+      const t0 = performance.now();
+      const step = (now) => { const p = Math.min(1, (now - t0) / duration); frame(p); if (p < 1) requestAnimationFrame(step); else resolve(); };
+      requestAnimationFrame(step);
+    });
+  }
+  function restartClass(el, cls) { el.classList.remove(cls); void el.getBoundingClientRect(); el.classList.add(cls); }
+  function inside(ev, r) { return ev.clientX >= r.left && ev.clientX <= r.right && ev.clientY >= r.top && ev.clientY <= r.bottom; }
+
+  /* ================= Icons ================= */
+  const S = 'fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"';
+  const FLY = '<ellipse class="wing" cx="-4" cy="-4.5" rx="5" ry="3" transform="rotate(-28 -4 -4.5)"/><ellipse class="wing" cx="4" cy="-4.5" rx="5" ry="3" transform="rotate(28 4 -4.5)"/><ellipse class="fly-body" cx="0" cy="0" rx="4.6" ry="3.8"/><circle class="fly-eye" cx="-2" cy="-1" r="1.3"/><circle class="fly-eye" cx="2" cy="-1" r="1.3"/>';
+  const ICON = {
+    home: `<svg viewBox="0 0 24 24" ${S}><path d="M3 11.5 12 4l9 7.5"/><path d="M5.5 10v9.5h13V10"/><path d="M10 19.5v-5h4v5"/></svg>`,
+    soundOn: `<svg viewBox="0 0 24 24" ${S}><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>`,
+    soundOff: `<svg viewBox="0 0 24 24" ${S}><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="m16 9.5 5 5m0-5-5 5"/></svg>`,
+    bulb: `<svg viewBox="0 0 24 24" ${S}><path d="M9 17.5h6M10 21h4"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2V16h5.2v-.2c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/></svg>`,
+    marker: `<svg viewBox="0 0 24 24" ${S}><path d="m14.5 4 5.5 5.5-9.5 9.5H5v-5.5z"/><path d="M3 22h18"/></svg>`,
+    reset: `<svg viewBox="0 0 24 24" ${S}><path d="M4 12a8 8 0 1 0 2.4-5.7"/><path d="M4 4v4.5h4.5"/></svg>`,
+    lock: `<svg viewBox="0 0 24 24" ${S}><rect x="5" y="11" width="14" height="10" rx="2.5"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>`,
+    carrot: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 8.6c1.2-2.4 1-4.6.2-5.8M15.6 9c2-1.4 4.3-1.6 5.6-1M15.3 8.8c.7-2.6 2.3-4 3.9-4.4" fill="none" stroke="#2f9e44" stroke-width="2.2" stroke-linecap="round"/><path d="M3.6 20.6c2.3-5.6 6.4-10.6 10.4-12.3 1.9-.8 3 .9 2.3 2.6C14.6 14.9 9.4 18.6 3.6 20.6z" fill="#ff8a3d" stroke="#1d2b4f" stroke-width="1.6" stroke-linejoin="round"/><path d="M8.6 13.6l1.6 1.2M11.2 11l1.5 1.1" stroke="#1d2b4f" stroke-width="1.3" stroke-linecap="round"/></svg>',
+    fly: `<svg viewBox="-10 -11 20 18" aria-hidden="true"><g class="fly">${FLY}</g></svg>`,
+    star: (on) => `<svg viewBox="0 0 24 24" class="${on ? 'star-on' : 'star-off'}" aria-hidden="true"><path d="M12 2.8l2.8 5.8 6.3.9-4.6 4.4 1.1 6.3L12 17.2l-5.6 3 1.1-6.3-4.6-4.4 6.3-.9z" stroke-width="1.8" stroke-linejoin="round"/></svg>`
+  };
+
+  /* ================= Sound ================= */
+  const sfx = {
+    ctx: null,
+    muted: store.get('nlh-muted', false),
+    init() {
+      if (!this.ctx) { const C = window.AudioContext || window.webkitAudioContext; if (C) { try { this.ctx = new C(); } catch (e) { this.ctx = null; } } }
+      if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+    },
+    tone(f, type = 'sine', dur = 0.15, vol = 0.16, f2 = null, delay = 0) {
+      if (this.muted || !this.ctx) return;
+      try {
+        const t = this.ctx.currentTime + delay;
+        const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+        o.type = type; o.frequency.setValueAtTime(f, t);
+        if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + dur);
+        g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        o.connect(g); g.connect(this.ctx.destination); o.start(t); o.stop(t + dur + 0.03);
+      } catch (e) { /* ignore */ }
+    },
+    tap() { this.tone(560, 'sine', 0.06, 0.1); },
+    boing(i) { this.tone(260 + i * 30, 'sine', 0.15, 0.14, 520 + i * 50); },
+    jump() { this.tone(220, 'sine', 0.3, 0.16, 740); },
+    land() { this.tone(170, 'triangle', 0.12, 0.18, 110); },
+    correct() { [523, 659, 784, 1047].forEach((f, i) => this.tone(f, 'triangle', 0.2, 0.18, null, i * 0.08)); },
+    wrong() { [392, 370, 349].forEach((f, i) => this.tone(f, 'sawtooth', 0.22, 0.06, null, i * 0.22)); this.tone(330, 'sawtooth', 0.7, 0.06, 240, 0.66); },
+    nope() { this.tone(210, 'square', 0.12, 0.06, 150); },
+    buzz() { this.tone(170, 'sawtooth', 0.6, 0.03, 210); },
+    slurp() { this.tone(1000, 'sine', 0.2, 0.15, 180); },
+    wobble() { this.tone(320, 'sine', 0.6, 0.14, 140); },
+    fanfare() { [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone(f, 'triangle', 0.32, 0.2, null, i * 0.1)); }
+  };
+  function renderSound() {
+    document.querySelectorAll('[data-sound]').forEach((b) => {
+      b.innerHTML = sfx.muted ? ICON.soundOff : ICON.soundOn;
+      b.setAttribute('aria-label', sfx.muted ? 'Turn sound on' : 'Turn sound off');
+      b.setAttribute('aria-pressed', String(!sfx.muted));
+    });
+  }
+
+  /* ================= Characters ================= */
+  const BUNNY = `
+    <ellipse class="shadow" cx="0" cy="1.5" rx="15" ry="3"/>
+    <g class="ear-l"><ellipse class="fur" cx="-7" cy="-47" rx="5.4" ry="14" transform="rotate(-12 -7 -47)"/><ellipse class="pink" cx="-7" cy="-46" rx="2.5" ry="9.5" transform="rotate(-12 -7 -46)"/></g>
+    <g class="ear-r"><ellipse class="fur" cx="7" cy="-47" rx="5.4" ry="14" transform="rotate(12 7 -47)"/><ellipse class="pink" cx="7" cy="-46" rx="2.5" ry="9.5" transform="rotate(12 7 -46)"/></g>
+    <ellipse class="fur" cx="-7.5" cy="-2.6" rx="6.2" ry="3.4"/>
+    <ellipse class="fur" cx="7.5" cy="-2.6" rx="6.2" ry="3.4"/>
+    <ellipse class="fur" cx="0" cy="-13" rx="12.5" ry="11.5"/>
+    <ellipse class="belly" cx="0" cy="-11" rx="7" ry="6.5"/>
+    <ellipse class="fur" cx="-10.5" cy="-13" rx="3.2" ry="4.4" transform="rotate(20 -10.5 -13)"/>
+    <ellipse class="fur" cx="10.5" cy="-13" rx="3.2" ry="4.4" transform="rotate(-20 10.5 -13)"/>
+    <circle class="fur" cx="0" cy="-30" r="13.5"/>
+    <ellipse class="blush" cx="-8.8" cy="-25.5" rx="2.8" ry="1.7"/>
+    <ellipse class="blush" cx="8.8" cy="-25.5" rx="2.8" ry="1.7"/>
+    <g class="eye-normal"><circle class="pupil" cx="-5" cy="-31" r="2.6"/><circle class="pupil" cx="5" cy="-31" r="2.6"/><circle class="shine" cx="-4.1" cy="-32" r=".9"/><circle class="shine" cx="5.9" cy="-32" r=".9"/></g>
+    <path class="eye-happy line" d="M-7.6 -30.5 q2.6 -3.4 5.2 0 M2.4 -30.5 q2.6 -3.4 5.2 0"/>
+    <path class="eye-dizzy line" d="M-7 -33 l4 4 M-3 -33 l-4 4 M3 -33 l4 4 M7 -33 l-4 4"/>
+    <ellipse class="nose" cx="0" cy="-26.5" rx="1.9" ry="1.4"/>
+    <path class="mouth-smile line" d="M-3.2 -24.4 q1.6 2 3.2 0 q1.6 2 3.2 0"/>
+    <path class="mouth-open" d="M-3.8 -24.2 q3.8 7 7.6 0 z"/>
+    <path class="mouth-sad line" d="M-3.2 -21.4 q3.2 -3 6.4 0"/>`;
+  const FROG = `
+    <ellipse class="shadow" cx="0" cy="1.5" rx="17" ry="3"/>
+    <ellipse class="skin" cx="-11" cy="-2.6" rx="7" ry="3.4"/>
+    <ellipse class="skin" cx="11" cy="-2.6" rx="7" ry="3.4"/>
+    <ellipse class="skin" cx="0" cy="-13" rx="15.5" ry="11.5"/>
+    <ellipse class="skin-light" cx="0" cy="-11" rx="9.5" ry="7"/>
+    <ellipse class="skin" cx="-13.5" cy="-11" rx="3.4" ry="5" transform="rotate(25 -13.5 -11)"/>
+    <ellipse class="skin" cx="13.5" cy="-11" rx="3.4" ry="5" transform="rotate(-25 13.5 -11)"/>
+    <circle class="skin" cx="-8.5" cy="-35" r="7.5"/>
+    <circle class="skin" cx="8.5" cy="-35" r="7.5"/>
+    <ellipse class="skin" cx="0" cy="-26" rx="17" ry="10.5"/>
+    <circle class="eye-white" cx="-8.5" cy="-35" r="5"/>
+    <circle class="eye-white" cx="8.5" cy="-35" r="5"/>
+    <g class="eye-normal"><circle class="pupil" cx="-8" cy="-34.5" r="2.6"/><circle class="pupil" cx="9" cy="-34.5" r="2.6"/><circle class="shine" cx="-7.1" cy="-35.6" r=".9"/><circle class="shine" cx="9.9" cy="-35.6" r=".9"/></g>
+    <path class="eye-happy line" d="M-11.3 -34 q2.8 -3.6 5.6 0 M5.7 -34 q2.8 -3.6 5.6 0"/>
+    <path class="eye-dizzy line" d="M-11 -37.5 l5 5 M-6 -37.5 l-5 5 M6 -37.5 l5 5 M11 -37.5 l-5 5"/>
+    <ellipse class="blush" cx="-11.5" cy="-23.5" rx="3" ry="1.8"/>
+    <ellipse class="blush" cx="11.5" cy="-23.5" rx="3" ry="1.8"/>
+    <path class="mouth-smile line" d="M-8 -24 q8 6.5 16 0"/>
+    <g class="mouth-open"><path d="M-8 -24 q8 10 16 0 z"/><ellipse class="tongue-fill" cx="0" cy="-19.8" rx="3.4" ry="1.8"/></g>
+    <path class="mouth-sad line" d="M-6 -19.5 q6 -4.5 12 0"/>`;
+
+  function mountChar(el, kind) {
+    el.setAttribute('class', 'char char-' + kind);
+    el.innerHTML = `<g class="squash"><g class="bob">${kind === 'bunny' ? BUNNY : FROG}</g></g>`;
+  }
+  function setMood(el, mood) {
+    el.classList.remove('mood-happy', 'mood-sad');
+    if (mood) { void el.getBoundingClientRect(); el.classList.add('mood-' + mood); }
+  }
+  function placeChar(el, x, y, s = 1) { el.setAttribute('transform', `translate(${x.toFixed(2)} ${y.toFixed(2)}) scale(${s})`); }
+  function squash(el, sx, sy) { const g = el.querySelector('.squash'); if (sx == null) g.removeAttribute('transform'); else g.setAttribute('transform', `scale(${sx.toFixed(3)} ${sy.toFixed(3)})`); }
+
+  /* ================= Shared UI ================= */
+  function say(id, html) { const b = $(id); b.innerHTML = html; restartClass(b, 'pop'); }
+  let toastTimer = null;
+  function toast(msg) { const t = $('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 2600); }
+  function stamp(id, text, good) { const s = $(id); s.textContent = text; s.className = 'stamp' + (good ? '' : ' bad'); void s.offsetWidth; s.classList.add('show'); clearTimeout(s._t); s._t = setTimeout(() => { s.className = 'stamp'; }, 1500); }
+  function wiggle(el) { restartClass(el, 'wiggle'); setTimeout(() => el.classList.remove('wiggle'), 500); }
+
+  function confetti(x, y, count = 34) {
+    if (RM) return;
+    const fx = $('fx');
+    const colors = ['var(--t1)', 'var(--t2)', 'var(--right)', 'var(--left)', 'var(--accent)'];
+    for (let i = 0; i < count; i++) {
+      const d = document.createElement('i');
+      d.className = 'confetti';
+      const size = 7 + Math.random() * 7;
+      d.style.cssText = `left:${x}px;top:${y}px;width:${size}px;height:${size * (Math.random() < .5 ? 1 : .55)}px;margin:${-size / 2}px 0 0 ${-size / 2}px;background:${colors[i % colors.length]};border-radius:${Math.random() < .4 ? '50%' : '2px'}`;
+      fx.appendChild(d);
+      const ang = (-160 + Math.random() * 140) * Math.PI / 180;
+      const v = 110 + Math.random() * 170;
+      const dx = Math.cos(ang) * v, dy = Math.sin(ang) * v, r = (Math.random() - .5) * 900;
+      const a = d.animate([
+        { transform: 'translate(0,0) rotate(0deg)', opacity: 1 },
+        { transform: `translate(${dx}px,${dy}px) rotate(${r / 2}deg)`, opacity: 1, offset: .4 },
+        { transform: `translate(${dx * 1.35}px,${dy + 280}px) rotate(${r}deg)`, opacity: 0 }
+      ], { duration: 1300 + Math.random() * 600, easing: 'cubic-bezier(.2,.7,.4,1)' });
+      a.onfinish = () => d.remove();
+    }
+  }
+  function centerOf(el) { const r = el.getBoundingClientRect(); return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; }
+  function collect(fromEl, kind, onArrive) {
+    const from = centerOf(fromEl), to = centerOf($('tb-count-icon'));
+    const el = document.createElement('div');
+    el.className = 'collect'; el.innerHTML = ICON[kind];
+    el.style.left = from.x + 'px'; el.style.top = from.y + 'px';
+    $('fx').appendChild(el);
+    const dx = to.x - from.x, dy = to.y - from.y;
+    const a = el.animate([
+      { transform: 'translate(0,0) scale(.6) rotate(0deg)' },
+      { transform: `translate(${dx * .35}px,${dy * .35 - 70}px) scale(1.7) rotate(-20deg)`, offset: .45 },
+      { transform: `translate(${dx}px,${dy}px) scale(.8) rotate(10deg)` }
+    ], { duration: RM ? 10 : 850, easing: 'ease-in-out' });
+    a.onfinish = () => { el.remove(); if (onArrive) onArrive(); };
+  }
+  function follow(scroller, svg, vbMinX, vbW, ux) {
+    if (scroller.scrollWidth <= scroller.clientWidth + 2) return;
+    const s = svg.getBoundingClientRect().width / vbW;
+    const left = (ux - vbMinX) * s - scroller.clientWidth / 2;
+    scroller.scrollTo({ left: Math.max(0, left), behavior: RM ? 'auto' : 'smooth' });
+  }
+
+  function buildAxis(g, c) {
+    g.innerHTML = '';
+    const a = c.toX(c.min) - 24, b = c.toX(c.max) + 24, y = c.axisY;
+    svgEl('line', { x1: a, y1: y, x2: b, y2: y, class: 'axis' }, g);
+    svgEl('polygon', { points: `${a - 9},${y} ${a + 4},${y - 7} ${a + 4},${y + 7}`, class: 'axis-head' }, g);
+    svgEl('polygon', { points: `${b + 9},${y} ${b - 4},${y - 7} ${b - 4},${y + 7}`, class: 'axis-head' }, g);
+    for (let i = c.min; i <= c.max; i++) {
+      const x = c.toX(i), zero = i === 0, major = !!c.major && i % c.major === 0;
+      const h = zero ? 13 : major ? 10 : 7;
+      const cls = zero ? ' zero' : major ? ' major' : '';
+      svgEl('line', { x1: x, y1: y - h, x2: x, y2: y + h, class: 'tick' + cls }, g);
+      const t = svgEl('text', { x, y: c.labelY, class: 'tick-label' + cls + ((c.hot || []).includes(i) ? ' hot' : '') }, g);
+      t.textContent = signed(i);
+    }
+  }
+  // Straight arrow from startX to tipX on row y; the TIP sits exactly on tipX.
+  function straightArrowPoints(startX, tipX, y, V) {
+    const dir = tipX >= startX ? 1 : -1;
+    const L = Math.abs(tipX - startX);
+    const h = Math.min(V.head, L * 0.6), t = V.thick / 2, hh = V.headHalf;
+    const baseX = tipX - dir * h;
+    return [[startX, y - t], [baseX, y - t], [baseX, y - hh], [tipX, y], [baseX, y + hh], [baseX, y + t], [startX, y + t]]
+      .map(([px, py]) => `${px.toFixed(2)},${py}`).join(' ');
+  }
+  function ring(layer, x, axisY, labelY, kind) {
+    svgEl('circle', { cx: x, cy: axisY, r: 5.5, class: 'ring-dot ' + kind }, layer);
+    svgEl('circle', { cx: x, cy: labelY - 5, r: 15, class: 'ring ' + kind }, layer);
+  }
+
+  /* ================= Top bar ================= */
+  let screen = 'home';
+  function showScreen(name) {
+    ['home', 'l1', 'l2'].forEach((s) => { $('screen-' + s).hidden = s !== name; });
+    $('topbar').hidden = name === 'home';
+    screen = name;
+    if (name === 'home') renderHome();
+    snapshot();
+  }
+  function setTop(level, idx, count) {
+    $('tb-level').textContent = 'Level ' + level;
+    $('tb-name').textContent = level === 1 ? "Pip's Arrow Hop" : "Freddie's Double Jump";
+    $('tb-q').textContent = `Question ${idx + 1} of 10`;
+    $('tb-bar').style.width = ((idx + 1) * 10) + '%';
+    $('tb-count-icon').innerHTML = level === 1 ? ICON.carrot : ICON.fly;
+    $('tb-count-num').textContent = count;
+    $('tb-count').setAttribute('aria-label', `${count} ${level === 1 ? 'carrots' : 'flies'} collected`);
+  }
+  function bumpCount(n, level) {
+    const el = $('tb-count-num'); el.textContent = n; restartClass(el, 'bump');
+    $('tb-count').setAttribute('aria-label', `${n} ${level === 1 ? 'carrots' : 'flies'} collected`);
+  }
+
+  /* ================= Home ================= */
+  const HERO = { unit: 34, axisY: 22, labelY: 46, vecY: 4, feetY: -2 };
+  let heroBunny, heroFrog;
+  function buildHero() {
+    const svg = $('hero-svg');
+    svg.innerHTML = '';
+    const ax = svgEl('g', {}, svg);
+    buildAxis(ax, { min: -5, max: 5, toX: (v) => v * HERO.unit, axisY: HERO.axisY, labelY: HERO.labelY, hot: [-3, 3] });
+    const V = { thick: 10, head: 18, headHalf: 12 };
+    const neg = svgEl('g', { class: 'vec-neg' }, svg);
+    svgEl('polygon', { class: 'vec-shape', points: straightArrowPoints(0, -3 * HERO.unit, HERO.vecY, V) }, neg);
+    const pos = svgEl('g', { class: 'vec-pos' }, svg);
+    svgEl('polygon', { class: 'vec-shape', points: straightArrowPoints(0, 3 * HERO.unit, HERO.vecY, V) }, pos);
+    svgEl('circle', { cx: 0, cy: HERO.vecY, r: 5, class: 'vec-dot' }, pos);
+    heroBunny = svgEl('g', {}, svg); mountChar(heroBunny, 'bunny'); placeChar(heroBunny, -3 * HERO.unit, HERO.feetY, 1);
+    heroFrog = svgEl('g', {}, svg); mountChar(heroFrog, 'frog'); placeChar(heroFrog, 3 * HERO.unit, HERO.feetY, 1);
+  }
+  let heroTurn = 0;
+  async function heroHop() {
+    if (screen !== 'home' || RM || document.hidden) return;
+    const el = heroTurn++ % 2 ? heroFrog : heroBunny;
+    const x = (el === heroBunny ? -3 : 3) * HERO.unit;
+    squash(el, 1.12, .88); await sleep(90);
+    await animate(420, (p) => { const s = Math.sin(p * Math.PI); placeChar(el, x, HERO.feetY - s * 18, 1); squash(el, 1 - .08 * s, 1 + .12 * s); });
+    squash(el, 1.14, .86); await sleep(90); squash(el, null);
+  }
+  function renderHome() {
+    const best = store.get('nlh-stars', {});
+    [1, 2].forEach((lv) => {
+      const n = best[lv] || 0;
+      $('best-' + lv).innerHTML = (n ? 'Best ' : 'Not played yet ') + [0, 1, 2].map((i) => ICON.star(i < n)).join('');
+      $('best-' + lv).setAttribute('aria-label', n ? `Best result: ${n} of 3 stars` : 'Not played yet');
+    });
+  }
+
+  /* ================= LEVEL 1 ================= */
+  const L1Q = [
+    { target: -7, options: [-7, 7, -4, -8] },
+    { target: 5, options: [5, -5, 3, -2] },
+    { target: -4, options: [-4, 4, -2, 6] },
+    { target: 3, options: [3, -3, 7, -5] },
+    { target: -9, options: [-9, 9, -5, 2] },
+    { target: 8, options: [8, -8, 5, -6] },
+    { target: -2, options: [-2, 2, -8, 3] },
+    { target: 6, options: [6, -6, 9, -4] },
+    { target: -5, options: [-5, 5, -1, 8] },
+    { target: 10, options: [10, -10, 6, -8] }
+  ];
+  const L1 = { origin: 400, unit: 34, axisY: 132, labelY: 159, vecY: 112, feetY: 106, vbW: 800, scale: .9 };
+  const ARROW = { thick: 10, head: 18, headHalf: 12 };
+  const x1 = (v) => L1.origin + v * L1.unit;
+  const L1_ASK = [
+    'Which arrow takes me from 0 to <b>{n}</b>? Drag it onto the number line!',
+    'Carrots are waiting at <b>{n}</b>! Which arrow gets me there?',
+    'Help me hop to <b>{n}</b>. Remember: every arrow starts at 0.',
+    'Next stop, <b>{n}</b>! Pick the arrow with the right length and direction.'
+  ];
+  const L1_YAY = ['Hop-tastic!', 'Bunny-believable!', 'Carrot-tastic!', 'Ear-resistible work!', 'Some-bunny is a superstar!'];
+  const L1_OOPS = ['Oopsie, wrong burrow!', 'Boing… my ears are spinning!', 'Whoops, I got lost!', 'Uh-oh, that was not the carrot patch!'];
+
+  let l1 = { idx: 0, correct: 0, results: [], busy: false, bunnyAt: 0, hint: false };
+
+  function arrowPoints(len) {
+    const dir = Math.sign(len) || 1, L = Math.abs(len);
+    const t = ARROW.thick / 2, h = Math.min(ARROW.head, L * 0.6), hh = ARROW.headHalf;
+    return [[0, -t], [L - h, -t], [L - h, -hh], [L, 0], [L - h, hh], [L - h, t], [0, t]].map(([x, y]) => `${(x * dir).toFixed(2)},${y}`).join(' ');
+  }
+  // Arrow body + head + a divider at every whole unit (so the length can be counted), tail at local 0.
+  function fillArrowGroup(g, len, unitsShown) {
+    g.innerHTML = '';
+    if (Math.abs(len) < 0.5) return;
+    svgEl('polygon', { points: arrowPoints(len), class: 'vec-shape' }, g);
+    const dir = Math.sign(len) || 1, L = Math.abs(len), h = Math.min(ARROW.head, L * 0.6);
+    for (let k = 1; k < unitsShown; k++) {
+      const x = k * L1.unit;
+      if (x >= L - h - 1) break;
+      svgEl('line', { x1: x * dir, x2: x * dir, y1: -ARROW.thick / 2 + 1, y2: ARROW.thick / 2 - 1, class: 'vec-divider' }, g);
+    }
+  }
+  function getUnitScale() {
+    const svg = $('l1-svg');
+    const ctm = svg.getScreenCTM && svg.getScreenCTM();
+    if (ctm && ctm.a > 0) return ctm.a;
+    const r = svg.getBoundingClientRect();
+    return (r.width / L1.vbW) || 1;
+  }
+  // A stand-alone arrow drawn at the number line's on-screen scale, so it is exactly |val| units long.
+  function buildCardArrow(val) {
+    const scale = getUnitScale();
+    const len = val * L1.unit, L = Math.abs(len), pad = 3;
+    const vbX = (val > 0 ? 0 : -L) - pad, vbY = -ARROW.headHalf - pad, vbW = L + pad * 2, vbH = ARROW.headHalf * 2 + pad * 2;
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('viewBox', `${vbX} ${vbY} ${vbW} ${vbH}`);
+    svg.setAttribute('width', (vbW * scale).toFixed(2));
+    svg.setAttribute('height', (vbH * scale).toFixed(2));
+    svg.setAttribute('class', val > 0 ? 'vec-pos' : 'vec-neg');
+    svg.setAttribute('aria-hidden', 'true');
+    const g = document.createElementNS(SVG_NS, 'g');
+    fillArrowGroup(g, len, Math.abs(val));
+    svg.appendChild(g);
+    return svg;
+  }
+  function rescaleCardArrows() {
+    document.querySelectorAll('#l1-options .opt-card').forEach((card) => {
+      const old = card.querySelector('svg');
+      if (old) card.replaceChild(buildCardArrow(Number(card.dataset.value)), old);
+    });
+  }
+
+  function l1Init() {
+    buildAxis($('l1-axis'), { min: -10, max: 10, toX: x1, axisY: L1.axisY, labelY: L1.labelY });
+    mountChar($('l1-bunny'), 'bunny');
+    placeChar($('l1-bunny'), x1(0), L1.feetY, L1.scale);
+    mountChar($('l1-avatar'), 'bunny');
+    $('l1-hint-btn').innerHTML = ICON.bulb + '<span>Hint</span>';
+    $('l1-hint-btn').addEventListener('click', l1ShowHint);
+    if ('ResizeObserver' in window) new ResizeObserver(rescaleCardArrows).observe($('l1-svg'));
+    else window.addEventListener('resize', rescaleCardArrows);
+  }
+
+  function startLevel1(resume) {
+    const r = resume && resume.idx < 10 ? resume : null;
+    l1 = { idx: r ? r.idx : 0, correct: r ? r.correct : 0, results: r ? r.results : [], busy: false, bunnyAt: l1.bunnyAt || 0, hint: false };
+    showScreen('l1');
+    l1Load();
+  }
+
+  async function l1Load() {
+    l1.busy = true;
+    const q = L1Q[l1.idx];
+    setTop(1, l1.idx, l1.correct);
+    $('l1-target').textContent = signed(q.target);
+    l1HideHint();
+    $('l1-vector').innerHTML = '';
+    $('l1-rings').innerHTML = '';
+    const bunny = $('l1-bunny');
+    setMood(bunny, null); setMood($('l1-avatar'), null);
+    l1BuildOptions(q);
+    follow($('l1-scroll'), $('l1-svg'), 0, L1.vbW, x1(0));
+    if (l1.bunnyAt !== 0) {
+      const from = x1(l1.bunnyAt);
+      sfx.jump();
+      await animate(RM ? 0 : 480, (p) => { const s = Math.sin(p * Math.PI); placeChar(bunny, from + (x1(0) - from) * p, L1.feetY - s * 30, L1.scale); squash(bunny, 1 - .08 * s, 1 + .12 * s); });
+      squash(bunny, null);
+      l1.bunnyAt = 0;
+    }
+    placeChar(bunny, x1(0), L1.feetY, L1.scale);
+    say('l1-bubble', pick(L1_ASK).replace('{n}', signed(q.target)));
+    l1.busy = false;
+    snapshot();
+  }
+
+  function l1BuildOptions(q) {
+    const box = $('l1-options');
+    box.innerHTML = '';
+    shuffle(q.options).forEach((val) => {
+      const n = Math.abs(val);
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'opt-card ' + (val > 0 ? 'vec-pos' : 'vec-neg');
+      card.dataset.value = val;
+      card.setAttribute('aria-label', `Arrow ${n} ${units(n)} to the ${val > 0 ? 'right' : 'left'}`);
+      card.appendChild(buildCardArrow(val));
+      const lab = document.createElement('span');
+      lab.className = 'opt-label';
+      lab.textContent = `${n} ${units(n)}`;
+      card.appendChild(lab);
+      l1Drag(card, val);
+      card.addEventListener('click', (e) => { if (e.detail === 0) l1Select(val); }); // keyboard
+      box.appendChild(card);
+    });
+  }
+
+  let ghost = null;
+  function l1Drag(card, val) {
+    card.addEventListener('pointerdown', (e) => {
+      if (l1.busy || ghost || e.button > 0) return;
+      sfx.init();
+      const zone = $('l1-drop');
+      const sx = e.clientX, sy = e.clientY;
+      let moved = false;
+      const move = (ev) => {
+        if (!moved && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 8) {
+          moved = true;
+          ghost = buildCardArrow(val);
+          ghost.classList.add('drag-ghost');
+          document.body.appendChild(ghost);
+          zone.classList.add('drag-over');
+          card.classList.add('lifted');
+          sfx.tap();
+        }
+        if (moved) {
+          ghost.style.left = ev.clientX + 'px';
+          ghost.style.top = ev.clientY + 'px';
+          zone.classList.toggle('drag-hot', inside(ev, zone.getBoundingClientRect()));
+        }
+      };
+      const cleanup = () => {
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', cleanup);
+        zone.classList.remove('drag-over', 'drag-hot');
+        card.classList.remove('lifted');
+        if (ghost) { ghost.remove(); ghost = null; }
+      };
+      const up = (ev) => {
+        cleanup();
+        if (!moved) {
+          wiggle(card);
+          toast('Drag the arrow card onto the number line!');
+          say('l1-bubble', 'Pick up an arrow card and <b>drop</b> it on the number line!');
+          return;
+        }
+        if (inside(ev, zone.getBoundingClientRect())) l1Select(val);
+      };
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', cleanup);
+    });
+  }
+
+  function l1HideHint() {
+    l1.hint = false;
+    $('l1-hint').hidden = true;
+    const b = $('l1-hint-btn');
+    b.disabled = false; b.setAttribute('aria-pressed', 'false');
+    b.querySelector('span').textContent = 'Hint';
+  }
+  function l1ShowHint() {
+    if (l1.busy || l1.hint) return;
+    sfx.init(); sfx.tap();
+    l1.hint = true;
+    const t = L1Q[l1.idx].target, n = Math.abs(t), side = t > 0 ? 'right' : 'left', colour = t > 0 ? 'green' : 'blue';
+    const h = $('l1-hint');
+    h.innerHTML = `<b>${signed(t)}</b> is <b>${n} ${units(n)}</b> to the <b>${side.toUpperCase()}</b> of 0. Look for the ${colour} arrow pointing ${side} that is ${n} ${units(n)} long. Its tip will land on the glowing circle.`;
+    h.hidden = false;
+    ring($('l1-rings'), x1(t), L1.axisY, L1.labelY, 'hint');
+    follow($('l1-scroll'), $('l1-svg'), 0, L1.vbW, x1(t / 2));
+    const b = $('l1-hint-btn');
+    b.disabled = true; b.setAttribute('aria-pressed', 'true');
+    b.querySelector('span').textContent = 'Hint shown';
+    say('l1-bubble', `Psst! Look for the glowing circle at <b>${signed(t)}</b>.`);
+  }
+
+  function countPop(x, k) {
+    const t = svgEl('text', { x, y: L1.feetY - 58, class: 'count-pop' }, $('l1-fx'));
+    t.textContent = k;
+    setTimeout(() => t.remove(), 800);
+  }
+
+  async function l1HopVector(val) {
+    const g = $('l1-vector');
+    g.innerHTML = '';
+    g.setAttribute('class', val > 0 ? 'vec-pos' : 'vec-neg');
+    const arrowG = svgEl('g', { transform: `translate(${L1.origin} ${L1.vecY})` }, g);
+    svgEl('circle', { cx: L1.origin, cy: L1.vecY, r: 5, class: 'vec-dot' }, g);
+    const n = Math.abs(val), dir = Math.sign(val);
+    const bunny = $('l1-bunny');
+    const HOP = RM ? 0 : 200;
+    for (let k = 1; k <= n; k++) {
+      sfx.boing(k);
+      await animate(HOP, (p) => {
+        const u = (k - 1) + p;
+        fillArrowGroup(arrowG, dir * u * L1.unit, n);
+        const s = Math.sin(p * Math.PI);
+        placeChar(bunny, x1(dir * u), L1.feetY - s * 17, L1.scale);
+        squash(bunny, 1 - .08 * s, 1 + .13 * s);
+      });
+      squash(bunny, 1.12, .88);
+      setTimeout(() => squash(bunny, null), 70);
+      countPop(x1(dir * k), k);
+    }
+    fillArrowGroup(arrowG, val * L1.unit, n);
+    l1.bunnyAt = val;
+    const ex = x1(val);
+    g.insertBefore(svgEl('line', { x1: ex, x2: ex, y1: L1.vecY, y2: L1.axisY, class: 'vec-guide' }), arrowG);
+    svgEl('circle', { cx: ex, cy: L1.axisY, r: 6, class: 'vec-dot' }, g);
+  }
+
+  async function l1Select(val) {
+    if (l1.busy) return;
+    l1.busy = true;
+    sfx.init();
+    $('l1-hint-btn').disabled = true;
+    document.querySelectorAll('#l1-options .opt-card').forEach((c) => c.classList.toggle('chosen', Number(c.dataset.value) === val));
+    const q = L1Q[l1.idx], ok = val === q.target, n = Math.abs(q.target), side = q.target > 0 ? 'right' : 'left';
+    follow($('l1-scroll'), $('l1-svg'), 0, L1.vbW, x1(val / 2));
+    say('l1-bubble', `Wheee! Hopping ${Math.abs(val)} ${units(Math.abs(val))} to the ${val > 0 ? 'right' : 'left'}…`);
+    await l1HopVector(val);
+
+    const expl = `<b>${signed(q.target)}</b> is ${n} ${units(n)} to the <b>${side}</b> of 0.`;
+    l1.results.push({ target: q.target, chose: val, ok });
+    const bunny = $('l1-bunny'), av = $('l1-avatar');
+    if (ok) {
+      l1.correct++;
+      sfx.correct();
+      setMood(bunny, 'happy'); setMood(av, 'happy');
+      stamp('l1-stamp', 'Correct!', true);
+      say('l1-bubble', `${pick(L1_YAY)} ${expl}`);
+      const c = centerOf(bunny); confetti(c.x, c.y);
+      const count = l1.correct;
+      collect(bunny, 'carrot', () => bumpCount(count, 1));
+    } else {
+      sfx.wrong();
+      setMood(bunny, 'sad'); setMood(av, 'sad');
+      stamp('l1-stamp', 'Not quite!', false);
+      ring($('l1-rings'), x1(q.target), L1.axisY, L1.labelY, 'answer');
+      say('l1-bubble', `${pick(L1_OOPS)} That arrow lands on <b>${signed(val)}</b>, but ${expl}`);
+    }
+    snapshot();
+    await sleep(ok ? 2200 : 3600);
+    if (screen !== 'l1') return;
+    l1.idx++;
+    if (l1.idx < L1Q.length) l1Load(); else finish(1);
+  }
+
+  /* ================= LEVEL 2 ================= */
+  const L2Q = [
+    { term1: 6, term2: -9 },
+    { term1: -3, term2: 7 },
+    { term1: -5, term2: -4 },
+    { term1: 8, term2: -12 },
+    { term1: -7, term2: 5 },
+    { term1: 9, term2: -5 },
+    { term1: -6, term2: -6 },
+    { term1: -8, term2: 11 },
+    { term1: 7, term2: -14 },
+    { term1: -4, term2: 12 }
+  ];
+  const L2 = { origin: 500, unit: 30, axisY: 110, labelY: 138, lanes: { 1: 86, 2: 64 }, feetY: 52, vbW: 1000, min: -15, max: 15 };
+  const V2 = { thick: 7, head: 16, headHalf: 9 };
+  const x2 = (v) => L2.origin + v * L2.unit;
+  const eqText = (q) => `${minus(q.term1)} ${q.term2 < 0 ? '−' : '+'} ${Math.abs(q.term2)}`;
+  const L2_YAY = ['Ribbit-tastic!', 'Toad-ally right!', 'Un-frog-ettable!', 'Hoppy days!', 'Frog-tastic!'];
+  const L2_OOPS = ['Splash! I missed the lily pad.', 'Croak… not quite!', 'Oops, I fell in the pond!', 'Ribbit? That does not look right.'];
+  const T1 = '<i class="tagtxt t1">Term 1</i>', T2 = '<i class="tagtxt t2">Term 2</i>';
+
+  let l2 = { idx: 0, correct: 0, results: [], step: 1, typed: '', v1: null, v2: null, locked: false, busy: false, timer: null, frogAt: 0, hl: store.get('nlh-hl', false) };
+
+  function l2Init() {
+    buildAxis($('l2-axis'), { min: L2.min, max: L2.max, toX: x2, axisY: L2.axisY, labelY: L2.labelY, major: 5 });
+    mountChar($('l2-frog'), 'frog');
+    placeChar($('l2-frog'), x2(0), L2.feetY, 1);
+    mountChar($('l2-avatar'), 'frog');
+    $('hl-btn').innerHTML = ICON.marker + '<span>Highlight terms</span>';
+    $('l2-reset').innerHTML = ICON.reset + '<span>Reset arrows</span>';
+    $('lock-icon').innerHTML = ICON.lock;
+    $('hl-btn').addEventListener('click', () => { sfx.init(); setHL(!l2.hl, true); });
+    $('l2-reset').addEventListener('click', async () => {
+      if (l2.locked || l2.busy) return;
+      sfx.init(); sfx.tap();
+      l2.busy = true;
+      await l2ResetArrows();
+      l2.busy = false;
+      say('l2-bubble', `Back to 0! Start again with a ${T1} arrow.`);
+      l2UpdateUI();
+    });
+    $('l2-keys').addEventListener('click', (e) => {
+      const btn = e.target.closest('.key');
+      if (!btn) return;
+      if (btn.dataset.key === 'CHECK') l2Check(); else l2Key(btn.dataset.key);
+    });
+    $('l2-next').addEventListener('click', () => { sfx.init(); sfx.tap(); l2Next(); });
+    document.addEventListener('keydown', (e) => {
+      if (screen !== 'l2' || l2.step < 3 || l2.locked || !$('modal').hidden) return;
+      if (e.key >= '0' && e.key <= '9') l2Key(e.key);
+      else if (e.key === '-' || e.key === '−') l2Key('-');
+      else if (e.key === 'Backspace') { e.preventDefault(); l2Key('DEL'); }
+      else if (e.key === 'Escape') l2Key('CLR');
+      else if (e.key === 'Enter') { e.preventDefault(); l2Check(); }
+    });
+    setHL(l2.hl, false);
+  }
+
+  function setHL(on, talk) {
+    l2.hl = on;
+    store.set('nlh-hl', on);
+    $('l2-eq').classList.toggle('hl', on);
+    $('screen-l2').classList.toggle('hl-on', on);
+    const b = $('hl-btn');
+    b.setAttribute('aria-pressed', String(on));
+    b.querySelector('span').textContent = on ? 'Hide highlights' : 'Highlight terms';
+    if (talk) {
+      sfx.tap();
+      if (on) say('l2-bubble', `Each colour is one term: ${T1} and ${T2}. The sign in front of a number belongs to that term!`);
+      else l2StepTalk();
+    }
+  }
+
+  function renderEquation(q) {
+    const t1 = q.term1, t2 = q.term2;
+    const t1Html = `<span class="term t1">${t1 > 0 ? '<span class="implied" aria-hidden="true">+</span>' : ''}${minus(t1)}<span class="term-tag">Term 1</span></span>`;
+    const t2Html = `<span class="term t2">${t2 < 0 ? '−' : '+'}&#8202;${Math.abs(t2)}<span class="term-tag">Term 2</span></span>`;
+    $('l2-eq').innerHTML = `${t1Html} ${t2Html} <span class="eq-rest">= ?</span>`;
+    $('l2-eq').setAttribute('aria-label', `${eqText(q)} equals what? Term 1 is ${signed(t1)}, term 2 is ${signed(t2)}.`);
+  }
+
+  function startLevel2(resume) {
+    const r = resume && resume.idx < 10 ? resume : null;
+    clearTimeout(l2.timer);
+    Object.assign(l2, { idx: r ? r.idx : 0, correct: r ? r.correct : 0, results: r ? r.results : [], locked: false, busy: false });
+    showScreen('l2');
+    l2Load();
+  }
+
+  async function l2Load() {
+    clearTimeout(l2.timer);
+    l2.locked = false; l2.busy = true;
+    const q = L2Q[l2.idx];
+    renderEquation(q);
+    setTop(2, l2.idx, l2.correct);
+    $('l2-next').hidden = true;
+    l2.typed = ''; l2RenderAnswer();
+    setMood($('l2-frog'), null); setMood($('l2-avatar'), null);
+    l2BuildCards(q);
+    await l2ResetArrows();
+    l2.busy = false;
+    l2StepTalk();
+    l2UpdateUI();
+    snapshot();
+  }
+
+  function l2BuildCards(q) {
+    const s1 = Math.sign(q.term1), s2 = Math.sign(q.term2);
+    const opts = shuffle([
+      { term: 1, mag: Math.abs(q.term1), dir: s1, correct: true },
+      { term: 1, mag: Math.abs(q.term1), dir: -s1, correct: false },
+      { term: 2, mag: Math.abs(q.term2), dir: s2, correct: true },
+      { term: 2, mag: Math.abs(q.term2), dir: -s2, correct: false }
+    ]);
+    const box = $('l2-cards');
+    box.innerHTML = '';
+    opts.forEach((opt) => {
+      const card = document.createElement('button');
+      card.type = 'button';
+      card.className = 'l2-card';
+      card.dataset.term = opt.term;
+      card.setAttribute('aria-label', `Term ${opt.term} arrow, ${opt.mag} ${units(opt.mag)} to the ${opt.dir > 0 ? 'right' : 'left'}`);
+      const pts = straightArrowPoints(opt.dir > 0 ? 6 : 126, opt.dir > 0 ? 126 : 6, 15, { thick: 11, head: 24, headHalf: 13 });
+      card.innerHTML = `<span class="tag t${opt.term}">Term ${opt.term}</span>
+        <svg class="card-arrow ${opt.dir > 0 ? 'vec-pos' : 'vec-neg'}" viewBox="0 0 132 30" aria-hidden="true"><polygon class="vec-shape" points="${pts}"/></svg>
+        <span class="opt-label ${opt.dir > 0 ? 'vec-pos' : 'vec-neg'}" style="color:${opt.dir > 0 ? 'var(--right)' : 'var(--left)'}">${opt.mag} ${units(opt.mag)}</span>`;
+      l2Drag(card, opt);
+      card.addEventListener('click', (e) => { if (e.detail === 0) l2Apply(opt, card); });
+      box.appendChild(card);
+    });
+  }
+
+  function l2Drag(card, opt) {
+    card.addEventListener('pointerdown', (e) => {
+      if (l2.locked || l2.busy || ghost || e.button > 0) return;
+      sfx.init();
+      const zone = $('l2-drop');
+      const sx = e.clientX, sy = e.clientY;
+      let moved = false;
+      const move = (ev) => {
+        if (!moved && Math.hypot(ev.clientX - sx, ev.clientY - sy) > 8) {
+          moved = true;
+          ghost = card.cloneNode(true);
+          ghost.classList.add('drag-ghost');
+          ghost.classList.remove('dim', 'lifted');
+          ghost.style.width = card.offsetWidth + 'px';
+          document.body.appendChild(ghost);
+          zone.classList.add('drag-over');
+          card.classList.add('lifted');
+          sfx.tap();
+        }
+        if (moved) {
+          ghost.style.left = ev.clientX + 'px';
+          ghost.style.top = ev.clientY + 'px';
+          zone.classList.toggle('drag-hot', inside(ev, zone.getBoundingClientRect()));
+        }
+      };
+      const cleanup = () => {
+        document.removeEventListener('pointermove', move);
+        document.removeEventListener('pointerup', up);
+        document.removeEventListener('pointercancel', cleanup);
+        zone.classList.remove('drag-over', 'drag-hot');
+        card.classList.remove('lifted');
+        if (ghost) { ghost.remove(); ghost = null; }
+      };
+      const up = (ev) => {
+        cleanup();
+        if (!moved || inside(ev, zone.getBoundingClientRect())) l2Apply(opt, card);
+      };
+      document.addEventListener('pointermove', move);
+      document.addEventListener('pointerup', up);
+      document.addEventListener('pointercancel', cleanup);
+    });
+  }
+
+  function l2StepTalk() {
+    if (l2.step === 1) say('l2-bubble', `I start at 0. Give me a ${T1} arrow!`);
+    else if (l2.step === 2) say('l2-bubble', `Now a ${T2} arrow. It starts where I landed!`);
+  }
+
+  function l2UpdateUI() {
+    document.querySelectorAll('#l2-steps li').forEach((li) => {
+      const s = Number(li.dataset.step);
+      li.classList.toggle('active', s === l2.step && !l2.locked);
+      li.classList.toggle('done', s < l2.step || (l2.locked && s === 3));
+    });
+    document.querySelectorAll('#l2-cards .l2-card').forEach((c) => c.classList.toggle('dim', l2.step === 3 || Number(c.dataset.term) !== l2.step));
+    $('l2-lock').hidden = l2.step === 3;
+    $('l2-reset').disabled = l2.locked;
+  }
+
+  function l2DrawVector(lane, startV, len) {
+    const g = $('l2-v' + lane);
+    g.innerHTML = '';
+    g.setAttribute('class', len > 0 ? 'vec-pos' : 'vec-neg');
+    const y = L2.lanes[lane], sx = x2(startV), ex = x2(startV + len), dir = Math.sign(len);
+    svgEl('line', { x1: sx, y1: y, x2: sx, y2: L2.axisY, class: 'vec-guide faint' }, g);
+    const body = svgEl('polygon', { class: 'vec-shape', points: straightArrowPoints(sx, sx + dir * .01, y, V2) }, g);
+    svgEl('circle', { cx: sx, cy: y, r: 4.5, class: 'vec-dot' }, g);
+    const tw = 26, tx = dir > 0 ? sx - 9 - tw : sx + 9;
+    const tag = svgEl('g', { class: 'lane-tag t' + lane }, g);
+    svgEl('rect', { x: tx, y: y - 8, width: tw, height: 16, rx: 6 }, tag);
+    svgEl('text', { x: tx + tw / 2, y: y + 4 }, tag).textContent = 'T' + lane;
+    return {
+      frame(p) { const tip = sx + (ex - sx) * p; body.setAttribute('points', straightArrowPoints(sx, Math.abs(tip - sx) < .01 ? sx + dir * .01 : tip, y, V2)); },
+      done() { g.insertBefore(svgEl('line', { x1: ex, y1: y, x2: ex, y2: L2.axisY, class: 'vec-guide' }), body); }
+    };
+  }
+
+  function dust(x, y, layer) {
+    if (RM) return;
+    [-12, -4, 4, 12].forEach((dx) => {
+      const c = svgEl('circle', { cx: x + dx, cy: y - 1, r: 2.4, class: 'dust' }, layer);
+      setTimeout(() => c.remove(), 550);
+    });
+  }
+
+  async function frogJump(fromV, toV, extraFrame) {
+    const frog = $('l2-frog');
+    const sx = x2(fromV), ex = x2(toV);
+    const dist = Math.abs(toV - fromV);
+    const peak = Math.min(50, 20 + dist * 2.4);
+    const dur = RM ? 0 : 380 + dist * 22;
+    squash(frog, 1.15, .85);
+    await sleep(RM ? 0 : 100);
+    sfx.jump();
+    await animate(dur, (p) => {
+      const s = Math.sin(p * Math.PI);
+      placeChar(frog, sx + (ex - sx) * p, L2.feetY - s * peak, 1);
+      squash(frog, 1 - .1 * s, 1 + .16 * s);
+      if (extraFrame) extraFrame(p);
+    });
+    sfx.land();
+    squash(frog, 1.2, .8);
+    dust(ex, L2.feetY, $('l2-fx'));
+    await sleep(RM ? 0 : 100);
+    squash(frog, null);
+  }
+
+  async function l2ResetArrows() {
+    $('l2-v1').innerHTML = ''; $('l2-v2').innerHTML = ''; $('l2-rings').innerHTML = '';
+    l2.v1 = null; l2.v2 = null; l2.step = 1;
+    setMood($('l2-frog'), null);
+    l2UpdateUI();
+    if (l2.frogAt !== 0) { await frogJump(l2.frogAt, 0); l2.frogAt = 0; }
+    placeChar($('l2-frog'), x2(0), L2.feetY, 1);
+    follow($('l2-scroll'), $('l2-svg'), 0, L2.vbW, x2(0));
+  }
+
+  async function l2Place(lane, startV, len) {
+    const vec = l2DrawVector(lane, startV, len);
+    const end = startV + len;
+    const land = Math.max(L2.min - .4, Math.min(L2.max + .4, end));
+    follow($('l2-scroll'), $('l2-svg'), 0, L2.vbW, x2((startV + land) / 2));
+    // the arrow keeps its true length even if Freddie runs out of number line
+    const reach = (land - startV) / len;
+    await frogJump(startV, land, (p) => vec.frame(Math.min(1, p / Math.max(reach, .0001))));
+    vec.frame(1); vec.done();
+    l2.frogAt = land;
+    return end;
+  }
+
+  async function l2Apply(opt, card) {
+    if (l2.locked || l2.busy) return;
+    sfx.init();
+    if (l2.step === 3) { toast('Both arrows are placed. Type your answer, or press Reset arrows.'); return; }
+    if (opt.term !== l2.step) {
+      sfx.nope(); wiggle(card);
+      say('l2-bubble', l2.step === 1 ? `Psst! Start with a ${T1} arrow. It comes first in the question.` : `That's a Term 1 arrow. Now I need a ${T2} arrow!`);
+      return;
+    }
+    l2.busy = true;
+    sfx.tap();
+    const sv = opt.dir * opt.mag;
+    if (l2.step === 1) {
+      l2.v1 = { ...opt, signed: sv };
+      say('l2-bubble', `Here I go! ${opt.mag} ${units(opt.mag)} to the ${opt.dir > 0 ? 'right' : 'left'}…`);
+      await l2Place(1, 0, sv);
+      l2.step = 2;
+      l2StepTalk();
+    } else {
+      l2.v2 = { ...opt, signed: sv };
+      say('l2-bubble', `Second jump! ${opt.mag} ${units(opt.mag)} to the ${opt.dir > 0 ? 'right' : 'left'}…`);
+      const end = await l2Place(2, l2.v1.signed, sv);
+      l2.step = 3;
+      if (end < L2.min || end > L2.max) {
+        setMood($('l2-frog'), 'sad'); setMood($('l2-avatar'), 'sad');
+        sfx.wobble();
+        say('l2-bubble', 'Whoa! I ran right off the end of the number line! Check which way each arrow points. Press <b>Reset arrows</b> to try again.');
+      } else if (l2.v1.correct && l2.v2.correct) {
+        ring($('l2-rings'), x2(end), L2.axisY, L2.labelY, 'land');
+        say('l2-bubble', 'Great arrows! What number am I sitting on? Type it in and press <b>CHECK</b>.');
+      } else {
+        say('l2-bubble', 'Where did I land? Type the number and press <b>CHECK</b>.');
+      }
+    }
+    l2.busy = false;
+    l2UpdateUI();
+  }
+
+  function l2RenderAnswer() { $('l2-answer').textContent = l2.typed === '' ? '?' : l2.typed.replace('-', '−'); }
+  function l2Key(key) {
+    if (l2.locked || l2.step < 3) return;
+    sfx.init(); sfx.tap();
+    if (key === 'DEL') l2.typed = l2.typed.slice(0, -1);
+    else if (key === 'CLR') l2.typed = '';
+    else if (key === '-') { if (l2.typed === '') l2.typed = '-'; else if (l2.typed === '-') l2.typed = ''; else if (!l2.typed.startsWith('-')) l2.typed = '-' + l2.typed; else l2.typed = l2.typed.slice(1); }
+    else if (/^[0-9]$/.test(key) && l2.typed.replace('-', '').length < 3) l2.typed += key;
+    l2RenderAnswer();
+  }
+
+  async function catchFly() {
+    const frog = $('l2-frog'), air = $('l2-air');
+    const mx = x2(l2.frogAt), my = L2.feetY - 21;
+    const side = l2.frogAt > 10 ? -1 : l2.frogAt < -10 ? 1 : (Math.random() < .5 ? -1 : 1);
+    const fx0 = mx + side * (70 + Math.random() * 40), fy0 = -22;
+    const fly = svgEl('g', { class: 'fly' }, air);
+    fly.innerHTML = FLY;
+    let fx = fx0, fy = fy0;
+    sfx.buzz();
+    await animate(RM ? 0 : 750, (p) => {
+      fx = fx0 + Math.sin(p * 18) * 10 - side * p * 20;
+      fy = fy0 + Math.cos(p * 13) * 7;
+      fly.setAttribute('transform', `translate(${fx.toFixed(1)} ${fy.toFixed(1)}) scale(${side > 0 ? -1.3 : 1.3} 1.3)`);
+    });
+    const tongue = svgEl('line', { x1: mx, y1: my, x2: mx, y2: my, class: 'tongue' }, air);
+    sfx.slurp();
+    await animate(RM ? 0 : 110, (p) => { tongue.setAttribute('x2', mx + (fx - mx) * p); tongue.setAttribute('y2', my + (fy - my) * p); });
+    await animate(RM ? 0 : 150, (p) => {
+      const q = 1 - p;
+      const tx = mx + (fx - mx) * q, ty = my + (fy - my) * q;
+      tongue.setAttribute('x2', tx); tongue.setAttribute('y2', ty);
+      fly.setAttribute('transform', `translate(${tx.toFixed(1)} ${ty.toFixed(1)}) scale(${1.3 * q})`);
+    });
+    tongue.remove(); fly.remove();
+    squash(frog, 1.12, .9); setTimeout(() => squash(frog, null), 120);
+  }
+
+  function l2Check() {
+    if (l2.locked || l2.busy) return;
+    sfx.init();
+    if (l2.step < 3) { sfx.nope(); toast('Place both arrows on the number line first.'); return; }
+    if (l2.typed === '' || l2.typed === '-') { sfx.nope(); toast('Type your answer with the keypad first.'); return; }
+    const q = L2Q[l2.idx], ans = q.term1 + q.term2, val = parseInt(l2.typed, 10);
+    const vecOk = l2.v1.correct && l2.v2.correct, ansOk = val === ans, ok = vecOk && ansOk;
+    l2.locked = true;
+    l2.results.push({ q, val, ans, ok, vecOk });
+    l2UpdateUI();
+    const frog = $('l2-frog'), av = $('l2-avatar');
+    $('l2-next').hidden = false;
+    if (ok) {
+      l2.correct++;
+      sfx.correct();
+      setMood(frog, 'happy'); setMood(av, 'happy');
+      stamp('l2-stamp', 'Correct!', true);
+      say('l2-bubble', `${pick(L2_YAY)} ${eqText(q)} = <b>${minus(ans)}</b>. Time for a snack…`);
+      const c = centerOf(frog); confetti(c.x, c.y);
+      const count = l2.correct;
+      catchFly().then(() => collect(frog, 'fly', () => bumpCount(count, 2)));
+      l2.timer = setTimeout(l2Next, 3000);
+    } else {
+      sfx.wrong();
+      setMood(frog, 'sad'); setMood(av, 'sad');
+      stamp('l2-stamp', 'Not quite!', false);
+      ring($('l2-rings'), x2(ans), L2.axisY, L2.labelY, 'answer');
+      let msg = `${pick(L2_OOPS)} ${eqText(q)} = <b>${minus(ans)}</b>.`;
+      if (ansOk && !vecOk) msg += ' Your number is right, but check which way each arrow points.';
+      else if (!ansOk && vecOk) msg += ' Your arrows were right. Read the number under the circle.';
+      say('l2-bubble', msg);
+      l2.timer = setTimeout(l2Next, 4200);
+    }
+    snapshot();
+  }
+
+  function l2Next() {
+    clearTimeout(l2.timer);
+    if (screen !== 'l2') return;
+    l2.idx++;
+    if (l2.idx < L2Q.length) l2Load(); else finish(2);
+  }
+
+  /* ================= Finish ================= */
+  let lastLevel = 1;
+  function finish(level) {
+    lastLevel = level;
+    const st = level === 1 ? l1 : l2;
+    const c = st.correct;
+    const stars = c >= 9 ? 3 : c >= 6 ? 2 : 1;
+    const best = store.get('nlh-stars', {});
+    best[level] = Math.max(best[level] || 0, stars);
+    store.set('nlh-stars', best);
+
+    const av = $('m-avatar');
+    mountChar(av, level === 1 ? 'bunny' : 'frog');
+    setMood(av, 'happy');
+    $('m-title').textContent = `Level ${level} complete!`;
+    $('m-stars').innerHTML = [0, 1, 2].map((i) => ICON.star(i < stars)).join('');
+    $('m-stars').querySelectorAll('.star-on').forEach((s, i) => { s.style.animationDelay = (0.25 + i * 0.25) + 's'; });
+    $('m-stars').setAttribute('aria-label', `${stars} of 3 stars`);
+    const thing = level === 1 ? (c === 1 ? 'carrot' : 'carrots') : (c === 1 ? 'fly' : 'flies');
+    $('m-score').innerHTML = `<b>${c}</b> / 10 correct · ${level === 1 ? 'Pip' : 'Freddie'} collected ${c} ${thing}`;
+    $('m-grade').textContent = stars === 3 ? (level === 1 ? 'Arrow Ace!' : 'Master Math Frog!') : stars === 2 ? 'Great job!' : 'Keep practising!';
+    const rev = $('m-review');
+    rev.innerHTML = '';
+    st.results.forEach((r, i) => {
+      const row = document.createElement('div');
+      if (level === 1) {
+        row.innerHTML = `<span>Q${i + 1}. Target ${signed(r.target)} · you chose ${signed(r.chose)}</span><span class="${r.ok ? 'ok' : 'no'}">${r.ok ? '✓ Correct' : '✗ Try again'}</span>`;
+      } else {
+        const note = r.ok ? '✓ Correct' : (r.val === r.ans ? '✗ Check arrows' : `✗ You said ${minus(r.val)}`);
+        row.innerHTML = `<span>Q${i + 1}. ${eqText(r.q)} = ${minus(r.ans)}</span><span class="${r.ok ? 'ok' : 'no'}">${note}</span>`;
+      }
+      rev.appendChild(row);
+    });
+    $('m-next').hidden = level !== 1;
+    $('modal').hidden = false;
+    sfx.fanfare();
+    setTimeout(() => { const c2 = centerOf($('m-stars')); confetti(c2.x, c2.y, 60); }, 250);
+    $(level === 1 ? 'm-next' : 'm-again').focus();
+    snapshot();
+  }
+  function closeModal() { $('modal').hidden = true; }
+
+  /* ================= State snapshot for live updates ================= */
+  function snapshot() {
+    try {
+      if (window.claude && window.claude.hot && typeof window.claude.hot.snapshot === 'function') {
+        window.claude.hot.snapshot(() => ({
+          screen,
+          l1: { idx: l1.idx, correct: l1.correct, results: l1.results },
+          l2: { idx: l2.idx, correct: l2.correct, results: l2.results }
+        }));
+      }
+    } catch (e) { /* not in a viewer */ }
+  }
+
+  /* ================= Boot ================= */
+  function start(data) {
+    renderSound();
+    $('tb-home').innerHTML = ICON.home;
+    document.querySelectorAll('[data-sound]').forEach((b) => b.addEventListener('click', () => {
+      sfx.muted = !sfx.muted; store.set('nlh-muted', sfx.muted); renderSound(); sfx.init(); sfx.tap();
+    }));
+    $('tb-home').addEventListener('click', () => { sfx.init(); sfx.tap(); clearTimeout(l2.timer); closeModal(); showScreen('home'); });
+    document.querySelectorAll('[data-start]').forEach((b) => b.addEventListener('click', () => {
+      sfx.init(); sfx.tap();
+      if (b.dataset.start === '1') startLevel1(); else startLevel2();
+    }));
+    $('m-again').addEventListener('click', () => { sfx.init(); closeModal(); lastLevel === 1 ? startLevel1() : startLevel2(); });
+    $('m-next').addEventListener('click', () => { sfx.init(); closeModal(); startLevel2(); });
+    $('m-home').addEventListener('click', () => { sfx.init(); closeModal(); showScreen('home'); });
+
+    buildHero();
+    l1Init();
+    l2Init();
+    setInterval(heroHop, 2600);
+
+    const d = data || {};
+    if (d.screen === 'l1' && d.l1) startLevel1(d.l1);
+    else if (d.screen === 'l2' && d.l2) startLevel2(d.l2);
+    else showScreen('home');
+  }
+
+  const hot = window.claude && window.claude.hot;
+  if (hot && typeof hot.ready === 'function') hot.ready(start);
+  else start((hot && hot.data) || {});
+})();
+</script>
+</body>
+</html>
