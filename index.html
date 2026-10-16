@@ -1,8 +1,4 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>Number Line Hop</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -229,6 +225,59 @@
   .star-on path { fill: var(--t2); stroke: var(--edge); }
   .star-off path { fill: var(--surface-2); stroke: var(--text-soft); }
   .teacher-note { text-align: center; color: var(--text-soft); font-size: .9rem; margin: 2px 0 0; line-height: 1.5; text-wrap: balance; }
+  .levels { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  @media (max-width: 820px) { .levels { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .levels { grid-template-columns: 1fr; } }
+  .level-card:nth-child(3) .level-badge { background: #a9e7ff; transform: rotate(-3deg); }
+
+  /* ---------- Level 3 battle ---------- */
+  .l3-mode { text-align: center; padding: clamp(18px, 4vw, 34px); }
+  .l3-mode h2, .l3-end h2 { font-family: var(--display); font-size: clamp(1.6rem, 5vw, 2.2rem); margin: 0; }
+  .l3-mode p { color: var(--text-soft); margin: 6px 0 18px; }
+  .l3-mode-buttons { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; }
+  .l3-question { text-align: center; padding: 12px 18px; }
+  .l3-question .equation { padding: 0; margin: 2px 0; }
+  .l3-status { margin: 0; min-height: 1.5em; color: var(--text-soft); font-weight: 800; }
+  .battle-arena { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px; overflow: hidden; background: linear-gradient(180deg, var(--surface), var(--surface-2)); }
+  .battle-fighter { min-width: 0; text-align: center; padding: 12px 10px; border: 2px solid var(--edge); border-radius: 20px; background: var(--surface); box-shadow: 0 4px 0 var(--shadow); }
+  .battle-fighter h3 { margin: 0; font-family: var(--display); font-size: 1.1rem; }
+  .battle-role { color: var(--text-soft); font-size: .78rem; }
+  .battle-avatar { display: block; width: clamp(68px, 12vw, 96px); height: 100px; margin: 4px auto 0; overflow: visible; }
+  #l3-char-2 { transform: scaleX(-1); }
+  .battle-hearts { display: flex; justify-content: center; gap: 5px; color: #e84163; font-size: 1.45rem; line-height: 1; }
+  .battle-hearts .spent { opacity: .22; }
+  .battle-vs { display: grid; place-items: center; width: 48px; height: 48px; border: 3px solid var(--edge); border-radius: 50%; background: var(--t2); color: var(--hl-ink); font-family: var(--display); font-size: 1.1rem; font-weight: 700; box-shadow: 0 3px 0 var(--shadow); }
+  .battle-fighter.attack-right { animation: attackRight .42s cubic-bezier(.2, .8, .3, 1); }
+  .battle-fighter.attack-left { animation: attackLeft .42s cubic-bezier(.2, .8, .3, 1); }
+  .battle-fighter.got-hit { animation: gotHit .42s ease-in-out; }
+  @keyframes attackRight { 45% { transform: translateX(28px) scale(1.08); } 100% { transform: none; } }
+  @keyframes attackLeft { 45% { transform: translateX(-28px) scale(1.08); } 100% { transform: none; } }
+  @keyframes gotHit { 20%, 60% { transform: translateX(-8px) rotate(-3deg); filter: saturate(.4); } 40%, 80% { transform: translateX(8px) rotate(3deg); } }
+  .battle-impact { position: absolute; left: 50%; top: 42%; z-index: 2; transform: translate(-50%, -50%) scale(0); font-size: clamp(2.6rem, 9vw, 4.5rem); opacity: 0; pointer-events: none; }
+  .battle-impact.show { animation: impactPop .55s cubic-bezier(.2, 1.7, .4, 1); }
+  @keyframes impactPop { 20% { opacity: 1; transform: translate(-50%, -50%) scale(1.2) rotate(-10deg); } 75% { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(8deg); } 100% { opacity: 0; transform: translate(-50%, -50%) scale(.4); } }
+  .battle-pads { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+  .battle-pad { padding: 12px; }
+  .battle-pad-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .battle-pad-head strong { font-family: var(--display); font-size: 1.05rem; }
+  .battle-answer-box { display: grid; place-items: center; width: 100%; min-height: 48px; margin-bottom: 8px; border: 2px solid var(--edge); border-radius: 12px; background: var(--surface-2); color: var(--accent-text); font: 700 1.8rem var(--display); font-variant-numeric: tabular-nums; }
+  .battle-keys { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .battle-keys .key { min-height: 43px; font-size: 1.05rem; }
+  .battle-keys .key-small { font-size: .78rem; }
+  .battle-keys .key-check { grid-column: span 2; }
+  .battle-keys .key-zero { grid-column: span 2; }
+  .computer-card { min-height: 150px; display: grid; place-items: center; text-align: center; line-height: 1.45; }
+  .computer-card .computer-icon { font-size: 2rem; }
+  .l3-end { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .l3-end p { margin: 0; color: var(--text-soft); }
+  .l3-end-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  @media (max-width: 640px) { .battle-pads { grid-template-columns: 1fr; } }
+  @media (max-width: 420px) {
+    .battle-arena { grid-template-columns: minmax(0, 1fr) 38px minmax(0, 1fr); gap: 6px; padding: 8px; }
+    .battle-fighter { padding: 8px 4px; }
+    .battle-avatar { width: 64px; height: 82px; }
+    .battle-vs { width: 38px; height: 38px; }
+  }
 
   /* ---------- Prompt card + speech bubble ---------- */
   .prompt { position: relative; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px 18px; align-items: center; overflow: hidden; }
@@ -496,12 +545,10 @@
   .collect svg { width: 100%; height: 100%; display: block; }
 
   @media (prefers-reduced-motion: reduce) {
-    .char *, .cloud, .bubble, .steps li, .ring, .home-hero h1 .hop, .hl-on .l2-card .tag, .bar i { animation: none !important; transition: none !important; }
+    .char *, .cloud, .bubble, .steps li, .ring, .home-hero h1 .hop, .hl-on .l2-card .tag, .bar i, .battle-fighter, .battle-impact { animation: none !important; transition: none !important; }
     .stamp.show { animation: none; opacity: 1; transform: translate(-50%, -50%) rotate(-9deg) scale(1); }
   }
 </style>
-</head>
-<body>
 
 <div class="sky" aria-hidden="true"><div class="cloud"></div><div class="cloud"></div><div class="cloud"></div></div>
 
@@ -537,8 +584,14 @@
         <div class="chips"><span class="chip">Addition</span><span class="chip">Subtraction</span><span class="chip">Terms</span></div>
         <div class="level-foot"><span class="best" id="best-2"></span><button class="btn btn-accent" type="button" data-start="2">Play Level 2</button></div>
       </article>
+      <article class="card level-card">
+        <div class="level-head"><span class="level-badge">3</span><h2>Number Line Battle</h2></div>
+        <p>Race to solve Level 2 style questions. Correct answers let Pip or Freddie strike and take a heart.</p>
+        <div class="chips"><span class="chip">Player vs computer</span><span class="chip">Player vs player</span><span class="chip">3 hearts each</span></div>
+        <div class="level-foot"><span class="best">Fast answers win the round!</span><button class="btn btn-accent" type="button" data-start="3">Play Level 3</button></div>
+      </article>
     </div>
-    <p class="teacher-note">For P.4 to P.6 · 10 questions per level · Start with Level 1, then move on to Level 2</p>
+    <p class="teacher-note">For P.4 to P.6 · Levels 1–2 practise vectors · Level 3 is a quick one-player or two-player battle</p>
   </section>
 
   <!-- ================= LEVEL 1 ================= -->
@@ -639,6 +692,64 @@
       <div class="lock" id="l2-lock"><span id="lock-icon"></span>Place both arrows on the number line to unlock the keypad</div>
     </div>
   </section>
+
+  <!-- ================= LEVEL 3 ================= -->
+  <section class="screen" id="screen-l3" hidden>
+    <div class="card l3-mode" id="l3-mode-choice">
+      <span class="eyebrow">Level 3 · Number Line Battle</span>
+      <h2>Choose your battle</h2>
+      <p>Both players get three hearts. Solve the equation first to land a strike!</p>
+      <div class="l3-mode-buttons">
+        <button class="btn btn-accent" type="button" data-battle-mode="cpu">Player vs computer</button>
+        <button class="btn btn-accent" type="button" data-battle-mode="pvp">Player vs player</button>
+      </div>
+    </div>
+    <div id="l3-game" hidden>
+      <div class="card l3-question">
+        <span class="eyebrow" id="l3-round-label">Question 1 of 10 · Solve as fast as you can</span>
+        <div class="equation" id="l3-equation" aria-live="polite"></div>
+        <p class="l3-status" id="l3-status" aria-live="polite">Type the answer on your number pad!</p>
+      </div>
+      <div class="card battle-arena" id="l3-arena">
+        <article class="battle-fighter" id="l3-fighter-1">
+          <h3>Pip</h3><span class="battle-role">Player 1</span>
+          <svg class="battle-avatar" viewBox="-32 -68 64 72" aria-hidden="true"><g id="l3-char-1"></g></svg>
+          <div class="battle-hearts" id="l3-hearts-1" aria-label="3 hearts">♥ ♥ ♥</div>
+        </article>
+        <div class="battle-vs" aria-hidden="true">VS</div>
+        <article class="battle-fighter" id="l3-fighter-2">
+          <h3>Freddie</h3><span class="battle-role" id="l3-player2-label">Player 2</span>
+          <svg class="battle-avatar" viewBox="-32 -68 64 72" aria-hidden="true"><g id="l3-char-2"></g></svg>
+          <div class="battle-hearts" id="l3-hearts-2" aria-label="3 hearts">♥ ♥ ♥</div>
+        </article>
+        <div class="battle-impact" id="l3-impact" aria-hidden="true">💥</div>
+      </div>
+      <div class="battle-pads">
+        <section class="card battle-pad" id="l3-pad-1">
+          <div class="battle-pad-head"><strong>Pip · Player 1</strong><span class="eyebrow">Number pad</span></div>
+          <output class="battle-answer-box" id="l3-answer-1" aria-live="polite">?</output>
+          <div class="battle-keys" id="l3-keys-1"></div>
+        </section>
+        <section class="card battle-pad" id="l3-pad-2">
+          <div class="battle-pad-head"><strong>Freddie · Player 2</strong><span class="eyebrow">Number pad</span></div>
+          <output class="battle-answer-box" id="l3-answer-2" aria-live="polite">?</output>
+          <div class="battle-keys" id="l3-keys-2"></div>
+        </section>
+        <section class="card computer-card" id="l3-computer" hidden>
+          <div><div class="computer-icon" aria-hidden="true">🤖</div><strong>Freddie is thinking…</strong><br><span class="eyebrow">Computer player</span></div>
+        </section>
+      </div>
+      <div class="card l3-end" id="l3-end" hidden>
+        <h2 id="l3-result">Battle over!</h2>
+        <p id="l3-result-detail"></p>
+        <div class="l3-end-actions">
+          <button class="btn btn-accent" type="button" id="l3-rematch">Rematch</button>
+          <button class="btn" type="button" id="l3-change-mode">Change mode</button>
+          <button class="btn" type="button" id="l3-menu">Level menu</button>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
 <div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="m-title">
@@ -735,7 +846,8 @@
     buzz() { this.tone(170, 'sawtooth', 0.6, 0.03, 210); },
     slurp() { this.tone(1000, 'sine', 0.2, 0.15, 180); },
     wobble() { this.tone(320, 'sine', 0.6, 0.14, 140); },
-    fanfare() { [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone(f, 'triangle', 0.32, 0.2, null, i * 0.1)); }
+    fanfare() { [523, 659, 784, 1047, 1319].forEach((f, i) => this.tone(f, 'triangle', 0.32, 0.2, null, i * 0.1)); },
+    strike() { this.tone(280, 'sawtooth', 0.2, 0.08, 95); this.tone(740, 'square', 0.09, 0.06, 420, 0.08); this.tone(150, 'triangle', 0.22, 0.14, 75, 0.1); }
   };
   function renderSound() {
     document.querySelectorAll('[data-sound]').forEach((b) => {
@@ -881,13 +993,14 @@
   /* ================= Top bar ================= */
   let screen = 'home';
   function showScreen(name) {
-    ['home', 'l1', 'l2'].forEach((s) => { $('screen-' + s).hidden = s !== name; });
+    ['home', 'l1', 'l2', 'l3'].forEach((s) => { $('screen-' + s).hidden = s !== name; });
     $('topbar').hidden = name === 'home';
     screen = name;
     if (name === 'home') renderHome();
     snapshot();
   }
   function setTop(level, idx, count) {
+    $('tb-count').hidden = false;
     $('tb-level').textContent = 'Level ' + level;
     $('tb-name').textContent = level === 1 ? "Pip's Arrow Hop" : "Freddie's Double Jump";
     $('tb-q').textContent = `Question ${idx + 1} of 10`;
@@ -1598,6 +1711,201 @@
     if (l2.idx < L2Q.length) l2Load(); else finish(2);
   }
 
+  /* ================= LEVEL 3: Number Line Battle ================= */
+  let l3 = { mode: null, idx: 0, typed: { 1: '', 2: '' }, hearts: { 1: 3, 2: 3 }, locked: false, cpuTimer: null, roundTimer: null };
+  const BATTLE_KEYS = ['1', '2', '3', 'DEL', '4', '5', '6', 'CLR', '7', '8', '9', '-', '0', 'CHECK'];
+  function clearBattleTimers() { clearTimeout(l3.cpuTimer); clearTimeout(l3.roundTimer); l3.cpuTimer = null; l3.roundTimer = null; }
+
+  function openLevel3() {
+    clearBattleTimers();
+    l3.mode = null;
+    showScreen('l3');
+    $('l3-mode-choice').hidden = false;
+    $('l3-game').hidden = true;
+    $('tb-level').textContent = 'Level 3';
+    $('tb-name').textContent = 'Number Line Battle';
+    $('tb-q').textContent = 'Choose a battle mode';
+    $('tb-bar').style.width = '0%';
+    $('tb-count').hidden = true;
+  }
+
+  function startBattle(mode) {
+    clearBattleTimers();
+    Object.assign(l3, { mode, idx: 0, typed: { 1: '', 2: '' }, hearts: { 1: 3, 2: 3 }, locked: false });
+    $('l3-mode-choice').hidden = true;
+    $('l3-game').hidden = false;
+    $('l3-pad-2').hidden = mode === 'cpu';
+    $('l3-computer').hidden = mode !== 'cpu';
+    $('l3-player2-label').textContent = mode === 'cpu' ? 'Computer' : 'Player 2';
+    $('l3-end').hidden = true;
+    showScreen('l3');
+    $('tb-count').hidden = true;
+    l3Load();
+  }
+
+  function renderBattleEquation(q) {
+    const t1 = q.term1, t2 = q.term2;
+    const a = `<span class="term t1">${t1 > 0 ? '<span class="implied" aria-hidden="true">+</span>' : ''}${minus(t1)}<span class="term-tag">Term 1</span></span>`;
+    const b = `<span class="term t2">${t2 < 0 ? '−' : '+'}&#8202;${Math.abs(t2)}<span class="term-tag">Term 2</span></span>`;
+    $('l3-equation').innerHTML = `${a} ${b} <span class="eq-rest">= ?</span>`;
+    $('l3-equation').setAttribute('aria-label', `${eqText(q)} equals what?`);
+  }
+
+  function updateBattleHearts() {
+    [1, 2].forEach((player) => {
+      const el = $('l3-hearts-' + player);
+      el.innerHTML = [0, 1, 2].map((i) => `<span class="${i < l3.hearts[player] ? 'full' : 'spent'}">${i < l3.hearts[player] ? '♥' : '♡'}</span>`).join('');
+      el.setAttribute('aria-label', `${l3.hearts[player]} hearts remaining`);
+    });
+  }
+
+  function renderBattleAnswer(player) {
+    $('l3-answer-' + player).textContent = l3.typed[player] === '' ? '?' : l3.typed[player].replace('-', '−');
+  }
+
+  function setBattleTop() {
+    $('tb-level').textContent = 'Level 3';
+    $('tb-name').textContent = 'Number Line Battle';
+    $('tb-q').textContent = `Round ${l3.idx + 1} of ${L2Q.length}`;
+    $('tb-bar').style.width = `${((l3.idx + 1) / L2Q.length) * 100}%`;
+    $('tb-count').hidden = true;
+    $('l3-round-label').textContent = `Question ${l3.idx + 1} of ${L2Q.length} · Solve as fast as you can`;
+  }
+
+  function l3Load() {
+    clearTimeout(l3.cpuTimer);
+    const q = L2Q[l3.idx];
+    if (!q) { finishBattle(); return; }
+    l3.locked = false;
+    l3.typed = { 1: '', 2: '' };
+    setBattleTop();
+    renderBattleEquation(q);
+    renderBattleAnswer(1); renderBattleAnswer(2);
+    updateBattleHearts();
+    $('l3-end').hidden = true;
+    $('l3-status').textContent = 'Type the answer on your number pad!';
+    ['l3-fighter-1', 'l3-fighter-2'].forEach((id) => $(id).classList.remove('attack-right', 'attack-left', 'got-hit'));
+    setMood($('l3-char-1'), null); setMood($('l3-char-2'), null);
+    if (l3.mode === 'cpu') l3.cpuTimer = setTimeout(l3ComputerAnswer, 4100 + Math.random() * 1800);
+  }
+
+  function l3Key(player, key) {
+    if (screen !== 'l3' || l3.mode == null || l3.locked || (player === 2 && l3.mode === 'cpu')) return;
+    sfx.init(); sfx.tap();
+    if (key === 'DEL') l3.typed[player] = l3.typed[player].slice(0, -1);
+    else if (key === 'CLR') l3.typed[player] = '';
+    else if (key === '-') {
+      if (l3.typed[player] === '') l3.typed[player] = '-';
+      else if (l3.typed[player] === '-') l3.typed[player] = '';
+      else if (!l3.typed[player].startsWith('-')) l3.typed[player] = '-' + l3.typed[player];
+      else l3.typed[player] = l3.typed[player].slice(1);
+    } else if (/^[0-9]$/.test(key) && l3.typed[player].replace('-', '').length < 3) l3.typed[player] += key;
+    renderBattleAnswer(player);
+  }
+
+  function l3Submit(player) {
+    if (screen !== 'l3' || l3.mode == null || l3.locked || (player === 2 && l3.mode === 'cpu')) return;
+    const val = l3.typed[player];
+    if (val === '' || val === '-') { sfx.init(); sfx.nope(); $('l3-status').textContent = `Player ${player}, type an answer first!`; return; }
+    const answer = L2Q[l3.idx].term1 + L2Q[l3.idx].term2;
+    if (parseInt(val, 10) === answer) { claimBattleRound(player); return; }
+    sfx.init(); sfx.nope();
+    const who = player === 1 ? 'Pip' : 'Freddie';
+    $('l3-status').textContent = `${who}'s answer is not quite right. Try again quickly!`;
+    const box = $('l3-answer-' + player);
+    restartClass(box, 'wiggle');
+    setTimeout(() => box.classList.remove('wiggle'), 500);
+  }
+
+  function l3ComputerAnswer() {
+    if (screen !== 'l3' || l3.mode !== 'cpu' || l3.locked) return;
+    if (Math.random() < .12) {
+      sfx.nope();
+      $('l3-status').textContent = 'Freddie made a mistake! You can still answer!';
+      l3.cpuTimer = setTimeout(l3ComputerAnswer, 850 + Math.random() * 650);
+      return;
+    }
+    claimBattleRound(2);
+  }
+
+  function claimBattleRound(player) {
+    if (l3.locked) return;
+    l3.locked = true;
+    clearTimeout(l3.cpuTimer);
+    const other = player === 1 ? 2 : 1;
+    const attacker = $('l3-fighter-' + player), target = $('l3-fighter-' + other);
+    const attackClass = player === 1 ? 'attack-right' : 'attack-left';
+    restartClass(attacker, attackClass);
+    restartClass(target, 'got-hit');
+    restartClass($('l3-impact'), 'show');
+    setMood($('l3-char-' + player), 'happy');
+    setMood($('l3-char-' + other), 'sad');
+    l3.hearts[other] = Math.max(0, l3.hearts[other] - 1);
+    updateBattleHearts();
+    sfx.correct(); sfx.strike();
+    const names = { 1: 'Pip', 2: 'Freddie' };
+    $('l3-status').textContent = `${names[player]} answered first! ${names[other]} loses a heart.`;
+    l3.roundTimer = setTimeout(() => {
+      if (screen !== 'l3') return;
+      if (l3.hearts[other] === 0 || l3.idx + 1 >= L2Q.length) finishBattle();
+      else { l3.idx++; l3Load(); }
+    }, 1500);
+  }
+
+  function finishBattle() {
+    clearBattleTimers();
+    l3.locked = true;
+    const result = l3.hearts[1] === l3.hearts[2] ? 'It’s a draw!' : (l3.hearts[1] > l3.hearts[2] ? 'Pip wins the battle!' : 'Freddie wins the battle!');
+    const detail = `Final hearts: Pip ${l3.hearts[1]} · Freddie ${l3.hearts[2]}`;
+    $('l3-result').textContent = result;
+    $('l3-result-detail').textContent = detail;
+    $('l3-end').hidden = false;
+    $('l3-status').textContent = result;
+    sfx.fanfare();
+    const c = centerOf($('l3-result'));
+    confetti(c.x, c.y, 44);
+    $('l3-rematch').focus();
+  }
+
+  function l3Init() {
+    mountChar($('l3-char-1'), 'bunny');
+    mountChar($('l3-char-2'), 'frog');
+    [1, 2].forEach((player) => {
+      const box = $('l3-keys-' + player);
+      BATTLE_KEYS.forEach((key) => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'key' + (['DEL', 'CLR'].includes(key) ? ' key-small' : '') + (key === 'CHECK' ? ' key-check' : '') + (key === '0' ? ' key-zero' : '');
+        btn.dataset.battleKey = key;
+        btn.textContent = key === '-' ? '−' : key;
+        if (key === 'CHECK') btn.setAttribute('aria-label', `Check Player ${player}'s answer`);
+        box.appendChild(btn);
+      });
+      box.addEventListener('click', (e) => {
+        const btn = e.target.closest('[data-battle-key]');
+        if (!btn) return;
+        if (btn.dataset.battleKey === 'CHECK') l3Submit(player); else l3Key(player, btn.dataset.battleKey);
+      });
+    });
+    document.querySelectorAll('[data-battle-mode]').forEach((btn) => btn.addEventListener('click', () => { sfx.init(); sfx.tap(); startBattle(btn.dataset.battleMode); }));
+    $('l3-rematch').addEventListener('click', () => { sfx.init(); sfx.tap(); startBattle(l3.mode); });
+    $('l3-change-mode').addEventListener('click', () => { sfx.init(); sfx.tap(); openLevel3(); });
+    $('l3-menu').addEventListener('click', () => { sfx.init(); sfx.tap(); clearBattleTimers(); showScreen('home'); });
+    document.addEventListener('keydown', (e) => {
+      if (screen !== 'l3' || l3.mode == null || l3.locked || !$('modal').hidden) return;
+      if (e.code.startsWith('Numpad') && l3.mode === 'pvp') {
+        if (/^Numpad[0-9]$/.test(e.code)) l3Key(2, e.code.slice(-1));
+        else if (e.code === 'NumpadSubtract') l3Key(2, '-');
+        else if (e.code === 'NumpadEnter') { e.preventDefault(); l3Submit(2); }
+        else if (e.code === 'NumpadDecimal') l3Key(2, 'DEL');
+      } else if (e.key >= '0' && e.key <= '9') l3Key(1, e.key);
+      else if (e.key === '-' || e.key === '−') l3Key(1, '-');
+      else if (e.key === 'Backspace') { e.preventDefault(); l3Key(1, 'DEL'); }
+      else if (e.key === 'Escape') l3Key(1, 'CLR');
+      else if (e.key === 'Enter') { e.preventDefault(); l3Submit(1); }
+    });
+  }
+
   /* ================= Finish ================= */
   let lastLevel = 1;
   function finish(level) {
@@ -1660,10 +1968,10 @@
     document.querySelectorAll('[data-sound]').forEach((b) => b.addEventListener('click', () => {
       sfx.muted = !sfx.muted; store.set('nlh-muted', sfx.muted); renderSound(); sfx.init(); sfx.tap();
     }));
-    $('tb-home').addEventListener('click', () => { sfx.init(); sfx.tap(); clearTimeout(l2.timer); closeModal(); showScreen('home'); });
+    $('tb-home').addEventListener('click', () => { sfx.init(); sfx.tap(); clearTimeout(l2.timer); clearBattleTimers(); closeModal(); showScreen('home'); });
     document.querySelectorAll('[data-start]').forEach((b) => b.addEventListener('click', () => {
       sfx.init(); sfx.tap();
-      if (b.dataset.start === '1') startLevel1(); else startLevel2();
+      if (b.dataset.start === '1') startLevel1(); else if (b.dataset.start === '2') startLevel2(); else openLevel3();
     }));
     $('m-again').addEventListener('click', () => { sfx.init(); closeModal(); lastLevel === 1 ? startLevel1() : startLevel2(); });
     $('m-next').addEventListener('click', () => { sfx.init(); closeModal(); startLevel2(); });
@@ -1672,6 +1980,7 @@
     buildHero();
     l1Init();
     l2Init();
+    l3Init();
     setInterval(heroHop, 2600);
 
     const d = data || {};
@@ -1685,5 +1994,5 @@
   else start((hot && hot.data) || {});
 })();
 </script>
-</body>
-</html>
+
+</body></html>
