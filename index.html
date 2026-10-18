@@ -376,6 +376,7 @@
   .lane-tag.t2 rect { fill: var(--t2); }
   .lane-tag text { fill: var(--hl-ink); font-family: var(--display); font-size: 11px; font-weight: 700; text-anchor: middle; }
   .tongue { stroke: var(--tongue); stroke-width: 4; stroke-linecap: round; }
+  .c2-tongue { stroke-width: 6; }
   .fly .wing { fill: rgba(200, 230, 255, .9); stroke: var(--char-line); stroke-width: .8; transform-box: fill-box; transform-origin: 50% 100%; animation: flap .07s linear infinite alternate; }
   .fly .fly-body { fill: #2b2f45; stroke: var(--char-line); stroke-width: .8; }
   .fly .fly-eye { fill: #e5484d; }
@@ -548,6 +549,104 @@
     .char *, .cloud, .bubble, .steps li, .ring, .home-hero h1 .hop, .hl-on .l2-card .tag, .bar i, .battle-fighter, .battle-impact { animation: none !important; transition: none !important; }
     .stamp.show { animation: none; opacity: 1; transform: translate(-50%, -50%) rotate(-9deg) scale(1); }
   }
+
+  /* ---------- Coordinate Plane Hop ---------- */
+  .game-section { display: flex; flex-direction: column; gap: 14px; margin-top: 12px; }
+  .game-section-heading { text-align: center; }
+  .game-section-heading h2 { margin: 2px 0 4px; font-family: var(--display); font-size: clamp(1.6rem, 5vw, 2.2rem); }
+  .game-section-heading p { margin: 0; color: var(--text-soft); }
+  .coord-prompt { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+  .coord-prompt h2 { margin: 2px 0 4px; font-family: var(--display); font-size: clamp(1.25rem, 4vw, 1.8rem); }
+  .coord-target { margin: 0; color: var(--accent-text); font: 700 clamp(2rem, 7vw, 3rem) var(--display); font-variant-numeric: tabular-nums; }
+  .coord-punctuation { color: #fff; }
+  .coord-x-value { color: var(--bad); }
+  .coord-y-value { color: var(--good); }
+  .coord-reward-counts { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
+  .coord-reward-count { white-space: nowrap; }
+  .coord-reward-count b { font-variant-numeric: tabular-nums; }
+  .coord-status { margin: 4px 0 0; min-height: 1.5em; color: var(--text-soft); font-weight: 800; }
+  .coord-board { display: grid; place-items: center; padding: 10px; overflow: hidden; }
+  .coord-svg { display: block; width: 100%; max-width: 560px; height: auto; touch-action: manipulation; }
+  .coord-svg .char { pointer-events: none; }
+  .coord-grid-line { stroke: var(--text-soft); stroke-width: 1; opacity: .24; }
+  .coord-axis-line { stroke: var(--axis); stroke-width: 3; }
+  .coord-grid-dot { fill: var(--text-soft); opacity: .5; }
+  .coord-label { fill: var(--tick-label); font-family: var(--display); font-size: 27px; font-weight: 700; text-anchor: middle; }
+  .coord-label.zero { fill: var(--text); font-size: 31.5px; font-weight: 800; }
+  .coord-axis-name { fill: var(--text); font: 700 22.5px var(--display); text-anchor: middle; }
+  .coord-guide-x { stroke: var(--bad); stroke-width: 3.5; stroke-dasharray: 2 5; stroke-linecap: round; opacity: .98; }
+  .coord-guide-y { stroke: var(--good); stroke-width: 3.5; stroke-dasharray: 2 5; stroke-linecap: round; opacity: .98; }
+  .coord-axis-hit { fill: transparent; stroke: transparent; cursor: pointer; pointer-events: all; }
+  .coord-axis-target-x { fill: var(--bad); fill-opacity: .2; stroke: var(--bad); stroke-width: 2; pointer-events: none; }
+  .coord-axis-target-y { fill: var(--good); fill-opacity: .22; stroke: var(--good); stroke-width: 2; pointer-events: none; }
+  .coord-axis-hint { stroke-width: 3.5; stroke-dasharray: 3 2; animation: coordHintPulse .8s ease-in-out 3; }
+  @keyframes coordHintPulse { 50% { fill-opacity: .48; stroke-width: 5; } }
+  .coord-axis-selected-x { fill: var(--bad); stroke: var(--edge); stroke-width: 2; }
+  .coord-axis-selected-y { fill: var(--good); stroke: var(--edge); stroke-width: 2; }
+  .coord-star { fill: var(--t2); stroke: var(--edge); stroke-width: 2; stroke-linejoin: round; }
+  .coord-choice { fill: var(--t1); stroke: var(--edge); stroke-width: 2.5; }
+  .coord-cursor { fill: none; stroke: var(--accent-text); stroke-width: 2.5; stroke-dasharray: 3 2; pointer-events: none; }
+  .coord-answer-ring { fill: none; stroke: var(--bad); stroke-width: 3; stroke-dasharray: 5 3; }
+  .coord-entry { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; margin: 4px 0 10px; }
+  .coord-field { min-width: 130px; display: flex; align-items: center; justify-content: center; gap: 10px; padding: 8px 14px; background: var(--surface-2); border: 2px solid var(--edge); border-radius: 14px; box-shadow: 0 3px 0 var(--shadow); cursor: pointer; font-family: var(--display); }
+  .coord-field.active { background: var(--t2); }
+  .coord-field strong { font-size: 1.1rem; }
+  .coord-field output { min-width: 2ch; color: var(--accent-text); font-size: 1.55rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .coord-instructions { margin: 0 0 10px; text-align: center; color: var(--text-soft); }
+  .coord-pad { max-width: 520px; margin: 0 auto; }
+  .coord-pad .key { min-height: 43px; }
+  .coord-battle-fields { display: flex; gap: 6px; margin: 6px 0; }
+  .coord-battle-fields .coord-field { min-width: 0; flex: 1; padding: 6px 5px; gap: 4px; font-size: .9rem; }
+  .coord-battle-fields .coord-field output { font-size: 1.25rem; }
+  .coord-battle-fields + .coord-pad .key { min-height: 39px; }
+  .coord-end { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 10px; }
+  .coord-end h2 { margin: 0; font-family: var(--display); font-size: 1.8rem; }
+  .coord-end p { margin: 0; color: var(--text-soft); }
+  .coord-end-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; }
+  .c2-layout { display: grid; grid-template-columns: minmax(0, 1fr) minmax(225px, 300px); gap: 12px; align-items: stretch; }
+  .c2-layout .coord-board { min-width: 0; }
+  .c2-layout .coord-svg { max-width: 670px; }
+  .c2-controls { display: flex; flex-direction: column; justify-content: center; padding: 12px; }
+  .c2-controls .coord-entry { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+  .c2-controls .coord-field { min-width: 0; padding: 8px 4px; }
+  .c2-controls .coord-hint-btn { width: 100%; margin: 0 0 8px; }
+  .c2-controls .coord-pad { width: 100%; max-width: none; }
+  .c1-svg { max-width: 670px; }
+  .c1-board { padding-top: 0; }
+  .coord-outcome-marker { font-size: 26px; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+  .c3-layout { position: relative; display: grid; grid-template-columns: minmax(180px, 1fr) minmax(0, 2fr) minmax(180px, 1fr); gap: 10px; align-items: start; }
+  .c3-side { display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+  .c3-side .battle-pad { padding: 10px; }
+  .c3-side .battle-pad-head { margin-bottom: 6px; }
+  .c3-side .battle-pad-head .eyebrow { font-size: .68rem; }
+  .c3-side .coord-battle-fields { gap: 4px; margin: 4px 0 6px; }
+  .c3-side .coord-battle-fields .coord-field { padding: 5px 3px; }
+  .c3-side .coord-battle-fields + .coord-pad .key { min-height: 36px; }
+  .c3-board { min-width: 0; }
+  .c3-board .coord-svg { max-width: 560px; }
+  .c3-layout .battle-fighter { padding: 10px 6px; }
+  #screen-c3 .c3-layout .battle-avatar { width: 100%; max-width: 98px; height: 96px; }
+  #c3-char-2 { transform: scaleX(-1); }
+  @media (max-width: 720px) {
+    .c2-layout { grid-template-columns: minmax(0, 1fr) minmax(205px, 245px); gap: 8px; }
+    .c3-layout { grid-template-columns: minmax(140px, 1fr) minmax(220px, 1.5fr) minmax(140px, 1fr); gap: 6px; }
+    .c3-layout .battle-fighter { padding: 8px 4px; }
+    #screen-c3 .c3-layout .battle-avatar { height: 86px; }
+  }
+  @media (max-width: 420px) {
+    .coord-board { padding: 4px; }
+    .coord-entry { gap: 6px; }
+    .coord-field { min-width: 112px; }
+    .coord-battle-fields .coord-field { font-size: .8rem; }
+  }
+  @media (max-width: 560px) {
+    .c2-layout { grid-template-columns: 1fr; }
+    .c2-controls { min-height: 300px; }
+    .c3-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+    .c3-board { grid-column: 1 / -1; grid-row: 1; }
+    .c3-side-1 { grid-column: 1; grid-row: 2; }
+    .c3-side-2 { grid-column: 2; grid-row: 2; }
+  }
 </style>
 
 <div class="sky" aria-hidden="true"><div class="cloud"></div><div class="cloud"></div><div class="cloud"></div></div>
@@ -592,6 +691,34 @@
       </article>
     </div>
     <p class="teacher-note">For P.4 to P.6 · Levels 1–2 practise vectors · Level 3 is a quick one-player or two-player battle</p>
+
+    <section class="game-section" aria-labelledby="coordinate-game-title">
+      <div class="game-section-heading">
+        <span class="eyebrow">A new adventure</span>
+        <h2 id="coordinate-game-title">Coordinate Plane Hop</h2>
+        <p>Help Pip and Freddie explore the rectangular coordinate system.</p>
+      </div>
+      <div class="levels">
+        <article class="card level-card">
+          <div class="level-head"><span class="level-badge">1</span><h2>Pip's Point Hop</h2></div>
+          <p>Tap the red x-axis value, then the green y-axis value, and choose their meeting point. Pip starts beside the grid and jumps to your choice for a carrot or a trap.</p>
+          <div class="chips"><span class="chip">−4 to 4</span><span class="chip">Ordered pairs</span><span class="chip">8 rounds</span></div>
+          <div class="level-foot"><span class="best">Locate the point!</span><button class="btn btn-accent" type="button" data-cstart="1">Play Level 1</button></div>
+        </article>
+        <article class="card level-card">
+          <div class="level-head"><span class="level-badge">2</span><h2>Freddie's Fly Hunt</h2></div>
+          <p>Read the fly's location and enter its x and y coordinates. Freddie waits beside the grid and licks it with his tongue.</p>
+          <div class="chips"><span class="chip">−4 to 4</span><span class="chip">Number pad</span><span class="chip">8 rounds</span></div>
+          <div class="level-foot"><span class="best">Find the fly!</span><button class="btn btn-accent" type="button" data-cstart="2">Play Level 2</button></div>
+        </article>
+        <article class="card level-card">
+          <div class="level-head"><span class="level-badge">3</span><h2>Coordinate Battle</h2></div>
+          <p>Race to name the star's coordinates. Pip and Freddie battle against the computer or challenge a friend.</p>
+          <div class="chips"><span class="chip">−4 to 4</span><span class="chip">Player vs computer</span><span class="chip">Player vs player</span><span class="chip">3 hearts each</span></div>
+          <div class="level-foot"><span class="best">Fast, accurate answers win!</span><button class="btn btn-accent" type="button" data-cstart="3">Play Level 3</button></div>
+        </article>
+      </div>
+    </section>
   </section>
 
   <!-- ================= LEVEL 1 ================= -->
@@ -749,6 +876,52 @@
         </div>
       </div>
     </div>
+  </section>
+
+  <!-- ============ COORDINATE PLANE · LEVEL 1 ============ -->
+  <section class="screen" id="screen-c1" hidden>
+    <div id="c1-game">
+      <div class="card coord-prompt">
+        <div><span class="eyebrow">Coordinate Level 1 · Pip's Point Hop</span><h2>Find the ordered pair</h2><p class="coord-target" id="c1-target"><span class="coord-punctuation">(</span><span class="coord-x-value">0</span><span class="coord-punctuation">, </span><span class="coord-y-value">0</span><span class="coord-punctuation">)</span></p><p class="coord-status" id="c1-status" aria-live="polite">Tap the grid point where the glowing lines meet.</p></div>
+        <div class="coord-reward-counts"><span class="chip">8 rounds · x, y, then the point</span><span class="chip coord-reward-count" aria-live="polite"><span aria-hidden="true">🥕</span> Carrots: <b id="c1-carrots">0</b></span></div>
+      </div>
+      <div class="card coord-board c1-board"><svg class="coord-svg c1-svg" id="c1-plane" viewBox="-110 21 670 539" role="application" tabindex="0" aria-keyshortcuts="ArrowUp ArrowDown ArrowLeft ArrowRight Enter" aria-label="Coordinate grid from negative four to four. Pip waits to the left. Tap x, then y, then the point; keyboard users can use the arrow keys and Enter."></svg></div>
+    </div>
+    <div class="card coord-end" id="c1-end" hidden><h2 id="c1-result">Point finder!</h2><p id="c1-score"></p><div class="coord-end-actions"><button class="btn btn-accent" type="button" id="c1-again">Play again</button><button class="btn" type="button" id="c1-home">Game menu</button></div></div>
+  </section>
+
+  <!-- ============ COORDINATE PLANE · LEVEL 2 ============ -->
+  <section class="screen" id="screen-c2" hidden>
+    <div id="c2-game">
+      <div class="card coord-prompt"><div><span class="eyebrow">Coordinate Level 2 · Freddie's Fly Hunt</span><h2>Where is the fly?</h2><p class="coord-status" id="c2-status" aria-live="polite">Freddie waits to the left. Read the fly's position, then enter x and y.</p></div><div class="coord-reward-counts"><span class="chip">8 rounds · x, y from −4 to 4</span><span class="chip coord-reward-count" aria-live="polite"><span aria-hidden="true">🪰</span> Flies caught: <b id="c2-flies">0</b></span></div></div>
+      <div class="c2-layout">
+        <div class="card coord-board c2-board"><svg class="coord-svg" id="c2-plane" viewBox="-110 0 670 560" role="img" aria-label="Coordinate grid from negative four to four with Freddie waiting at the left and a fly with red x and green y guide lines"></svg></div>
+        <div class="card c2-controls"><div class="coord-entry"><button class="coord-field active" type="button" id="c2-field-x" data-c2-axis="x" aria-pressed="true"><strong>x</strong><output id="c2-value-x">?</output></button><button class="coord-field" type="button" id="c2-field-y" data-c2-axis="y" aria-pressed="false"><strong>y</strong><output id="c2-value-y">?</output></button></div><button class="btn coord-hint-btn" type="button" id="c2-hint">Hint for selected axis</button><p class="coord-instructions">Choose x or y, enter its coordinate, and press CHECK. HINT circles that axis value.</p><div class="battle-keys coord-pad" id="c2-keys"></div></div>
+      </div>
+    </div>
+    <div class="card coord-end" id="c2-end" hidden><h2 id="c2-result">Fly finder!</h2><p id="c2-score"></p><div class="coord-end-actions"><button class="btn btn-accent" type="button" id="c2-again">Play again</button><button class="btn" type="button" id="c2-home">Game menu</button></div></div>
+  </section>
+
+  <!-- ============ COORDINATE PLANE · LEVEL 3 ============ -->
+  <section class="screen" id="screen-c3" hidden>
+    <div class="card l3-mode" id="c3-mode-choice"><span class="eyebrow">Coordinate Level 3 · Coordinate Battle</span><h2>Choose your battle</h2><p>Both players get three hearts. Find the star's coordinates first to land a strike!</p><div class="l3-mode-buttons"><button class="btn btn-accent" type="button" data-cbattle-mode="cpu">Player vs computer</button><button class="btn btn-accent" type="button" data-cbattle-mode="pvp">Player vs player</button></div></div>
+    <div id="c3-game" hidden>
+      <div class="card l3-question"><span class="eyebrow" id="c3-round-label">Round 1 of 8</span><p class="coord-status" id="c3-status" aria-live="polite">Find the star's coordinates!</p></div>
+      <div class="c3-layout">
+        <div class="c3-side c3-side-1">
+          <article class="battle-fighter" id="c3-fighter-1"><h3>Pip</h3><span class="battle-role">Player 1</span><svg class="battle-avatar" viewBox="-32 -68 64 72" aria-hidden="true"><g id="c3-char-1"></g></svg><div class="battle-hearts" id="c3-hearts-1" aria-label="3 hearts">♥ ♥ ♥</div></article>
+          <section class="card battle-pad"><div class="battle-pad-head"><strong>Pip · Player 1</strong><span class="eyebrow">Number pad</span></div><div class="coord-battle-fields"><button class="coord-field active" type="button" data-c3-axis="1:x"><strong>x</strong><output id="c3-value-1-x">?</output></button><button class="coord-field" type="button" data-c3-axis="1:y"><strong>y</strong><output id="c3-value-1-y">?</output></button></div><div class="battle-keys coord-pad" id="c3-keys-1"></div></section>
+        </div>
+        <div class="card coord-board c3-board"><svg class="coord-svg" id="c3-plane" viewBox="0 0 560 560" role="img" aria-label="Coordinate grid from negative four to four with a star and red x and green y guide lines"></svg></div>
+        <div class="c3-side c3-side-2">
+          <article class="battle-fighter" id="c3-fighter-2"><h3>Freddie</h3><span class="battle-role" id="c3-player2-label">Player 2</span><svg class="battle-avatar" viewBox="-32 -68 64 72" aria-hidden="true"><g id="c3-char-2"></g></svg><div class="battle-hearts" id="c3-hearts-2" aria-label="3 hearts">♥ ♥ ♥</div></article>
+          <section class="card battle-pad" id="c3-pad-2"><div class="battle-pad-head"><strong>Freddie · Player 2</strong><span class="eyebrow">Number pad</span></div><div class="coord-battle-fields"><button class="coord-field active" type="button" data-c3-axis="2:x"><strong>x</strong><output id="c3-value-2-x">?</output></button><button class="coord-field" type="button" data-c3-axis="2:y"><strong>y</strong><output id="c3-value-2-y">?</output></button></div><div class="battle-keys coord-pad" id="c3-keys-2"></div></section>
+          <section class="card computer-card" id="c3-computer" hidden><div><div class="computer-icon" aria-hidden="true">🤖</div><strong>Freddie is thinking…</strong><br><span class="eyebrow">Computer player</span></div></section>
+        </div>
+        <div class="battle-impact" id="c3-impact" aria-hidden="true">💥</div>
+      </div>
+    </div>
+    <div class="card l3-end" id="c3-end" hidden><h2 id="c3-result">Battle over!</h2><p id="c3-result-detail"></p><div class="l3-end-actions"><button class="btn btn-accent" type="button" id="c3-rematch">Rematch</button><button class="btn" type="button" id="c3-change-mode">Change mode</button><button class="btn" type="button" id="c3-home">Game menu</button></div></div>
   </section>
 </main>
 
@@ -1017,7 +1190,7 @@
   /* ================= Top bar ================= */
   let screen = 'home';
   function showScreen(name) {
-    ['home', 'l1', 'l2', 'l3'].forEach((s) => { $('screen-' + s).hidden = s !== name; });
+    ['home', 'l1', 'l2', 'l3', 'c1', 'c2', 'c3'].forEach((s) => { $('screen-' + s).hidden = s !== name; });
     $('topbar').hidden = name === 'home';
     screen = name;
     if (name === 'home') renderHome();
@@ -1932,6 +2105,455 @@
     });
   }
 
+  /* ================= Coordinate Plane Hop ================= */
+  const COORD = { min: -4, max: 4, left: 18, top: 40, unit: 62.5 };
+  const coordX = (x) => COORD.left + (x - COORD.min) * COORD.unit;
+  const coordY = (y) => COORD.top + (COORD.max - y) * COORD.unit;
+  const coordPair = (p) => '(' + minus(p.x) + ', ' + minus(p.y) + ')';
+  const randomCoordinate = () => Math.floor(Math.random() * 9) - 4;
+  const randomCoordPair = () => ({ x: randomCoordinate(), y: randomCoordinate() });
+  const coordDraftText = (v) => v === '' ? '?' : v === '-' ? '−' : minus(parseInt(v, 10));
+
+  function drawCoordPlane(svg, options = {}) {
+    svg.innerHTML = '';
+    const right = coordX(COORD.max), bottom = coordY(COORD.min), zeroX = coordX(0), zeroY = coordY(0);
+    const grid = svgEl('g', { 'aria-hidden': 'true' }, svg);
+    for (let v = COORD.min; v <= COORD.max; v++) {
+      const x = coordX(v), y = coordY(v), isZero = v === 0;
+      svgEl('line', { x1: x, y1: COORD.top, x2: x, y2: bottom, class: isZero ? 'coord-axis-line' : 'coord-grid-line' }, grid);
+      svgEl('line', { x1: COORD.left, y1: y, x2: right, y2: y, class: isZero ? 'coord-axis-line' : 'coord-grid-line' }, grid);
+      const xt = svgEl('text', { x, y: zeroY + 18, class: 'coord-label' + (isZero ? ' zero' : '') }, grid);
+      xt.textContent = minus(v);
+      const yt = svgEl('text', { x: zeroX - 16, y: y + 4, class: 'coord-label' + (isZero ? ' zero' : '') }, grid);
+      yt.textContent = minus(v);
+    }
+    const xName = svgEl('text', { x: right + 17, y: zeroY + 5, class: 'coord-axis-name' }, grid); xName.textContent = 'x';
+    const yName = svgEl('text', { x: zeroX + (options.compactYName ? 18 : 0), y: options.compactYName ? COORD.top + 22 : COORD.top - 18, class: 'coord-axis-name' }, grid); yName.textContent = 'y';
+    for (let x = COORD.min; x <= COORD.max; x++) for (let y = COORD.min; y <= COORD.max; y++) {
+      svgEl('circle', { cx: coordX(x), cy: coordY(y), r: 2, class: 'coord-grid-dot' }, grid);
+    }
+    if (options.hint) {
+      const hx = coordX(options.hint.x), hy = coordY(options.hint.y);
+      svgEl('line', { x1: hx, y1: COORD.top, x2: hx, y2: bottom, class: 'coord-guide-x' }, svg);
+      svgEl('line', { x1: COORD.left, y1: hy, x2: right, y2: hy, class: 'coord-guide-y' }, svg);
+    }
+    if (options.fly) {
+      const fx = coordX(options.fly.x), fy = coordY(options.fly.y);
+      if (options.guides) {
+        svgEl('line', { x1: fx, y1: COORD.top, x2: fx, y2: bottom, class: 'coord-guide-x' }, svg);
+        svgEl('line', { x1: COORD.left, y1: fy, x2: right, y2: fy, class: 'coord-guide-y' }, svg);
+      }
+      if (options.star) {
+        const points = Array.from({ length: 10 }, (_, i) => {
+          const angle = -Math.PI / 2 + i * Math.PI / 5, radius = i % 2 ? 7 : 15;
+          return (fx + Math.cos(angle) * radius).toFixed(2) + ',' + (fy + Math.sin(angle) * radius).toFixed(2);
+        }).join(' ');
+        svgEl('polygon', { points, class: 'coord-star', 'aria-label': 'Star target' }, svg);
+      } else {
+        svgEl('circle', { cx: fx, cy: fy, r: 8, class: 'coord-choice' }, svg);
+        const fly = svgEl('g', { id: svg.id + '-fly', class: 'fly', transform: 'translate(' + fx + ' ' + (fy - 8) + ') scale(1.35)' }, svg);
+        fly.innerHTML = FLY;
+      }
+    }
+  }
+  function addCoordAxisHitTargets(svg) {
+    const layer = svgEl('g', { 'aria-hidden': 'true' }, svg), zeroX = coordX(0), zeroY = coordY(0);
+    for (let value = COORD.min; value <= COORD.max; value++) {
+      svgEl('circle', { cx: coordX(value), cy: zeroY + 18, r: 14, class: 'coord-axis-hit', 'data-axis-value': value, 'data-axis': 'x' }, layer);
+      svgEl('circle', { cx: zeroX - 16, cy: coordY(value) + 4, r: 14, class: 'coord-axis-hit', 'data-axis-value': value, 'data-axis': 'y' }, layer);
+    }
+  }
+  function promptCoordAxisValue(svg, axis, value) {
+    const zeroX = coordX(0), zeroY = coordY(0);
+    const cx = axis === 'x' ? coordX(value) : zeroX - 16;
+    const cy = axis === 'x' ? zeroY + 18 : coordY(value) + 4;
+    svgEl('circle', { cx, cy, r: 14, class: 'coord-axis-target-' + axis, 'aria-hidden': 'true' }, svg);
+  }
+  function markCoordAxisValue(svg, axis, value) {
+    if (axis === 'x') svgEl('circle', { cx: coordX(value), cy: coordY(0), r: 6, class: 'coord-axis-selected-x', 'aria-hidden': 'true' }, svg);
+    else svgEl('circle', { cx: coordX(0), cy: coordY(value), r: 6, class: 'coord-axis-selected-y', 'aria-hidden': 'true' }, svg);
+  }
+  function addCoordCursor(svg) {
+    return svgEl('circle', { id: 'c1-cursor', cx: coordX(c1.cursor.x), cy: coordY(c1.cursor.y), r: 9, class: 'coord-cursor', 'aria-hidden': 'true' }, svg);
+  }
+  function coordMark(svg, p, className) {
+    const group = svgEl('g', {}, svg);
+    svgEl('circle', { cx: coordX(p.x), cy: coordY(p.y), r: 7, class: className || 'coord-choice' }, group);
+    svgEl('circle', { cx: coordX(p.x), cy: coordY(p.y), r: 12, class: 'ring answer' }, group);
+  }
+  function updateCoordTop(level, round) {
+    $('tb-level').textContent = 'Coordinate Level ' + level;
+    $('tb-name').textContent = 'Coordinate Plane Hop';
+    $('tb-q').textContent = 'Question ' + (round + 1) + ' of 8';
+    $('tb-bar').style.width = (((round + 1) / 8) * 100) + '%';
+    $('tb-count').hidden = true;
+  }
+  function coordStars(n) { return n >= 7 ? 3 : n >= 5 ? 2 : 1; }
+  function coordEndScore(level, correct) {
+    const stars = coordStars(correct);
+    $('c' + level + '-result').textContent = stars === 3 ? 'Coordinate superstar!' : stars === 2 ? 'Great exploring!' : 'Keep practising!';
+    const prize = level === 1 ? correct + ' carrot' + (correct === 1 ? '' : 's') + ' collected' : correct + ' ' + (correct === 1 ? 'fly' : 'flies') + ' caught';
+    $('c' + level + '-score').textContent = correct + ' of 8 points found · ' + stars + ' star' + (stars === 1 ? '' : 's') + ' · ' + prize;
+    $('c' + level + '-game').hidden = true;
+    $('c' + level + '-end').hidden = false;
+  }
+  async function coordHopAt(character, from, to, scale, height) {
+    const sx = from.x, sy = from.y, ex = to.x, ey = to.y;
+    squash(character, 1.12, .88);
+    sfx.jump();
+    await animate(RM ? 0 : 520, (p) => {
+      const arc = Math.sin(p * Math.PI);
+      placeChar(character, sx + (ex - sx) * p, sy + (ey - sy) * p - arc * height, scale);
+      squash(character, 1 - .08 * arc, 1 + .13 * arc);
+    });
+    squash(character, 1.16, .84); sfx.land();
+    await sleep(RM ? 0 : 90); squash(character, null);
+  }
+  async function coordHop(character, from, to, scale, offsetY, height) {
+    await coordHopAt(character,
+      { x: coordX(from.x), y: coordY(from.y) + offsetY },
+      { x: coordX(to.x), y: coordY(to.y) + offsetY }, scale, height);
+  }
+
+  const COORD_RABBIT_START = { x: -5.3, y: 0 };
+  const COORD_RABBIT_SCALE = 1.28;
+  let c1 = { round: 0, correct: 0, point: null, stage: 0, rabbitAt: { ...COORD_RABBIT_START }, cursor: { x: 0, y: 0 }, locked: false, timer: null };
+  function startCoordinate1() {
+    clearTimeout(c1.timer);
+    Object.assign(c1, { round: 0, correct: 0, point: null, stage: 0, rabbitAt: { ...COORD_RABBIT_START }, cursor: { x: 0, y: 0 }, locked: false });
+    $('c1-carrots').textContent = '0';
+    $('c1-game').hidden = false; $('c1-end').hidden = true;
+    showScreen('c1'); c1Load();
+  }
+  function c1Load() {
+    if (c1.round >= 8) { coordEndScore(1, c1.correct); return; }
+    c1.point = randomCoordPair(); c1.stage = 0; c1.locked = false; c1.rabbitAt = { ...COORD_RABBIT_START };
+    updateCoordTop(1, c1.round);
+    $('c1-target').innerHTML = '<span class="coord-punctuation">(</span><span class="coord-x-value">' + minus(c1.point.x) + '</span><span class="coord-punctuation">, </span><span class="coord-y-value">' + minus(c1.point.y) + '</span><span class="coord-punctuation">)</span>';
+    $('c1-status').textContent = 'Step 1 of 3: Tap x = ' + minus(c1.point.x) + ' on the x-axis.';
+    const svg = $('c1-plane');
+    const rabbitTop = coordY(c1.point.y) + 5 - 68 * COORD_RABBIT_SCALE;
+    const viewTop = Math.min(COORD.top - 19, rabbitTop - 4);
+    svg.setAttribute('viewBox', '-110 ' + viewTop.toFixed(2) + ' 670 ' + (560 - viewTop).toFixed(2));
+    drawCoordPlane(svg, { compactYName: true });
+    addCoordAxisHitTargets(svg);
+    promptCoordAxisValue(svg, 'x', c1.point.x);
+    const rabbit = svgEl('g', { id: 'c1-rabbit' }, svg); mountChar(rabbit, 'bunny');
+    placeChar(rabbit, coordX(c1.rabbitAt.x), coordY(c1.rabbitAt.y) + 5, COORD_RABBIT_SCALE);
+    addCoordCursor(svg);
+  }
+  function coordCursorMove(dx, dy) {
+    if (c1.stage === 0) { c1.cursor.x = Math.max(COORD.min, Math.min(COORD.max, c1.cursor.x + dx)); c1.cursor.y = 0; }
+    else if (c1.stage === 1) { c1.cursor.x = c1.point.x; c1.cursor.y = Math.max(COORD.min, Math.min(COORD.max, c1.cursor.y + dy)); }
+    else {
+      c1.cursor.x = Math.max(COORD.min, Math.min(COORD.max, c1.cursor.x + dx));
+      c1.cursor.y = Math.max(COORD.min, Math.min(COORD.max, c1.cursor.y + dy));
+    }
+    const cursor = $('c1-cursor');
+    if (cursor) { cursor.setAttribute('cx', coordX(c1.cursor.x)); cursor.setAttribute('cy', coordY(c1.cursor.y)); }
+  }
+  function c1PickAxis(axis, value) {
+    if (c1.locked || c1.stage > 1) return;
+    const expectedAxis = c1.stage === 0 ? 'x' : 'y';
+    const expected = c1.point[expectedAxis];
+    if ((axis !== expectedAxis && value !== 0) || value !== expected) {
+      sfx.nope();
+      $('c1-status').textContent = 'Not that axis value yet. Tap ' + expectedAxis + ' = ' + minus(expected) + ' on the ' + expectedAxis + '-axis.';
+      return;
+    }
+    sfx.correct();
+    if (expectedAxis === 'x') {
+      c1.cursor.x = value; c1.cursor.y = 0; c1.stage = 1;
+      markCoordAxisValue($('c1-plane'), 'x', value);
+      coordCursorMove(0, 0);
+      promptCoordAxisValue($('c1-plane'), 'y', c1.point.y);
+      $('c1-status').textContent = 'Step 2 of 3: Now tap y = ' + minus(c1.point.y) + ' on the y-axis.';
+      return;
+    }
+    c1.cursor.y = value; c1.stage = 2;
+    drawCoordPlane($('c1-plane'), { hint: c1.point, compactYName: true });
+    const rabbit = svgEl('g', { id: 'c1-rabbit' }, $('c1-plane')); mountChar(rabbit, 'bunny');
+    placeChar(rabbit, coordX(c1.rabbitAt.x), coordY(c1.rabbitAt.y) + 5, COORD_RABBIT_SCALE);
+    addCoordCursor($('c1-plane'));
+    $('c1-status').textContent = 'Step 3 of 3: Tap where the red x-line and green y-line meet.';
+  }
+  async function c1Select(x, y) {
+    if (c1.locked || screen !== 'c1' || c1.stage !== 2) return;
+    c1.locked = true;
+    const selected = { x, y }, ok = x === c1.point.x && y === c1.point.y;
+    const rabbit = $('c1-rabbit');
+    await coordHop(rabbit, c1.rabbitAt, selected, COORD_RABBIT_SCALE, 5, 72);
+    c1.rabbitAt = selected;
+    coordMark($('c1-plane'), selected, 'coord-choice');
+    if (!ok) coordMark($('c1-plane'), c1.point, 'ring answer');
+    const outcome = svgEl('text', { x: coordX(selected.x), y: coordY(selected.y) - 100, class: 'coord-outcome-marker', 'aria-hidden': 'true' }, $('c1-plane'));
+    if (ok) { outcome.textContent = '🥕'; c1.correct++; $('c1-carrots').textContent = c1.correct; sfx.correct(); confetti(centerOf($('c1-plane')).x, centerOf($('c1-plane')).y, 22); $('c1-status').textContent = 'Right on the spot! Pip got the carrot at ' + coordPair(c1.point) + '! 🥕'; }
+    else { outcome.textContent = '🪤'; sfx.wrong(); $('c1-status').textContent = 'Pip landed on a trap at ' + coordPair(selected) + '! The target was ' + coordPair(c1.point) + '.'; }
+    c1.timer = setTimeout(() => { if (screen === 'c1') { c1.round++; c1Load(); } }, ok ? 1250 : 1800);
+  }
+
+  const COORD_FROG_START = { x: -55, y: 325 };
+  const COORD_FROG_SCALE = 1.48;
+  let c2 = { round: 0, correct: 0, point: null, values: { x: '', y: '' }, active: 'x', locked: false, timer: null };
+  function startCoordinate2() {
+    clearTimeout(c2.timer);
+    Object.assign(c2, { round: 0, correct: 0, point: null, values: { x: '', y: '' }, active: 'x', locked: false });
+    $('c2-flies').textContent = '0';
+    $('c2-game').hidden = false; $('c2-end').hidden = true;
+    showScreen('c2'); c2Load();
+  }
+  function c2Load() {
+    if (c2.round >= 8) { coordEndScore(2, c2.correct); return; }
+    c2.point = randomCoordPair(); c2.values = { x: '', y: '' }; c2.active = 'x'; c2.locked = false;
+    updateCoordTop(2, c2.round);
+    $('c2-status').textContent = 'Freddie is waiting on the left. Read the fly\'s position, then enter x and y.';
+    const svg = $('c2-plane'); drawCoordPlane(svg, { fly: c2.point, guides: true });
+    const frog = svgEl('g', { id: 'c2-frog' }, svg); mountChar(frog, 'frog');
+    placeChar(frog, COORD_FROG_START.x, COORD_FROG_START.y, COORD_FROG_SCALE);
+    c2RenderValues();
+  }
+  function c2RenderValues() {
+    ['x', 'y'].forEach((axis) => {
+      $('c2-value-' + axis).textContent = coordDraftText(c2.values[axis]);
+      const button = $('c2-field-' + axis), active = c2.active === axis;
+      button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active));
+    });
+  }
+  function c2ShowAxisHint(axis, prefix = 'Hint:') {
+    const svg = $('c2-plane'), previous = $('c2-axis-hint');
+    if (previous) previous.remove();
+    const zeroX = coordX(0), zeroY = coordY(0), value = c2.point[axis];
+    const cx = axis === 'x' ? coordX(value) : zeroX - 16;
+    const cy = axis === 'x' ? zeroY + 18 : coordY(value) + 4;
+    svgEl('circle', { id: 'c2-axis-hint', cx, cy, r: 14, class: 'coord-axis-target-' + axis + ' coord-axis-hint', 'aria-hidden': 'true' }, svg);
+    $('c2-status').textContent = prefix + ' ' + axis + ' = ' + minus(value) + ' is circled on the ' + axis + '-axis. Correct that value and press CHECK again.';
+  }
+  function editCoordDraft(values, axis, key) {
+    let value = values[axis] || '';
+    if (key === 'DEL') value = value.slice(0, -1);
+    else if (key === 'CLR') value = '';
+    else if (key === '-') {
+      if (value === '') value = '-';
+      else if (value.startsWith('-')) value = value.slice(1);
+      else if (value !== '0') value = '-' + value;
+    } else if (/^[0-9]$/.test(key)) value = (value.startsWith('-') ? '-' : '') + key;
+    values[axis] = value;
+  }
+  function c2Key(key) {
+    if (c2.locked) return;
+    sfx.init(); sfx.tap();
+    if (key === 'CHECK') { c2Check(); return; }
+    editCoordDraft(c2.values, c2.active, key); c2RenderValues();
+  }
+  async function c2Check() {
+    if (c2.locked) return;
+    const xv = c2.values.x, yv = c2.values.y;
+    if (!xv || xv === '-' || !yv || yv === '-') { sfx.nope(); $('c2-status').textContent = 'Fill in both x and y coordinates first.'; return; }
+    const xCorrect = parseInt(xv, 10) === c2.point.x, yCorrect = parseInt(yv, 10) === c2.point.y;
+    if (!xCorrect || !yCorrect) {
+      sfx.wrong();
+      c2.active = xCorrect ? 'y' : 'x';
+      c2RenderValues();
+      c2ShowAxisHint(c2.active, 'Not quite.');
+      return;
+    }
+    c2.locked = true; c2.correct++; $('c2-flies').textContent = c2.correct; sfx.correct(); $('c2-status').textContent = 'Correct! Freddie is reaching for the fly…';
+    await c2LickFly();
+    c2.timer = setTimeout(() => { if (screen === 'c2') { c2.round++; c2Load(); } }, 700);
+  }
+  async function c2LickFly() {
+    const frog = $('c2-frog'), point = c2.point;
+    setMood(frog, 'happy');
+    const fx = coordX(point.x), fy = coordY(point.y) - 8;
+    const mouth = { x: COORD_FROG_START.x + 2, y: COORD_FROG_START.y - 24 * COORD_FROG_SCALE };
+    const tongue = svgEl('line', { x1: mouth.x, y1: mouth.y, x2: mouth.x, y2: mouth.y, class: 'tongue c2-tongue' }, $('c2-plane'));
+    const fly = $('c2-plane-fly');
+    sfx.slurp();
+    await animate(RM ? 0 : 430, (p) => {
+      tongue.setAttribute('x2', mouth.x + (fx - mouth.x) * p);
+      tongue.setAttribute('y2', mouth.y + (fy - mouth.y) * p);
+    });
+    await animate(RM ? 0 : 220, (p) => {
+      const q = 1 - p;
+      tongue.setAttribute('x2', mouth.x + (fx - mouth.x) * q);
+      tongue.setAttribute('y2', mouth.y + (fy - mouth.y) * q);
+      if (fly) fly.setAttribute('transform', 'translate(' + (fx + (mouth.x - fx) * p).toFixed(1) + ' ' + (fy + (mouth.y - fy) * p).toFixed(1) + ') scale(' + (1.35 * q).toFixed(2) + ')');
+    });
+    tongue.remove(); if (fly) fly.remove();
+    $('c2-status').textContent = 'Nom! Freddie licked the fly at ' + coordPair(point) + '.';
+  }
+
+  let c3 = { mode: null, round: 0, point: null, values: { 1: { x: '', y: '' }, 2: { x: '', y: '' } }, active: { 1: 'x', 2: 'x' }, hearts: { 1: 3, 2: 3 }, locked: false, cpuTimer: null, roundTimer: null };
+  function clearCoordBattleTimers() { clearTimeout(c3.cpuTimer); clearTimeout(c3.roundTimer); c3.cpuTimer = null; c3.roundTimer = null; }
+  function clearCoordinateTimers() { clearTimeout(c1.timer); clearTimeout(c2.timer); clearCoordBattleTimers(); }
+  function openCoordinate3() {
+    clearCoordBattleTimers(); c3.mode = null; showScreen('c3');
+    $('c3-mode-choice').hidden = false; $('c3-game').hidden = true; $('c3-end').hidden = true;
+    $('tb-level').textContent = 'Coordinate Level 3'; $('tb-name').textContent = 'Coordinate Battle'; $('tb-q').textContent = 'Choose a battle mode'; $('tb-bar').style.width = '0%'; $('tb-count').hidden = true;
+  }
+  function startCoordinateBattle(mode) {
+    clearCoordBattleTimers();
+    Object.assign(c3, { mode, round: 0, point: null, values: { 1: { x: '', y: '' }, 2: { x: '', y: '' } }, active: { 1: 'x', 2: 'x' }, hearts: { 1: 3, 2: 3 }, locked: false });
+    $('c3-mode-choice').hidden = true; $('c3-game').hidden = false; $('c3-end').hidden = true;
+    $('c3-pad-2').hidden = mode === 'cpu'; $('c3-computer').hidden = mode !== 'cpu';
+    $('c3-player2-label').textContent = mode === 'cpu' ? 'Computer' : 'Player 2';
+    showScreen('c3'); c3Load();
+  }
+  function c3Load() {
+    clearTimeout(c3.cpuTimer);
+    if (c3.round >= 8) { finishCoordinateBattle(); return; }
+    c3.point = randomCoordPair(); c3.locked = false;
+    c3.values = { 1: { x: '', y: '' }, 2: { x: '', y: '' } }; c3.active = { 1: 'x', 2: 'x' };
+    updateCoordTop(3, c3.round);
+    $('c3-round-label').textContent = 'Round ' + (c3.round + 1) + ' of 8 · Read the star\'s coordinates';
+    $('c3-status').textContent = 'Enter the star\'s ordered pair (x, y) on your number pad!';
+    drawCoordPlane($('c3-plane'), { fly: c3.point, guides: true, star: true });
+    c3RenderValues(); c3UpdateHearts();
+    ['c3-fighter-1', 'c3-fighter-2'].forEach((id) => $(id).classList.remove('attack-right', 'attack-left', 'got-hit'));
+    setMood($('c3-char-1'), null); setMood($('c3-char-2'), null);
+    if (c3.mode === 'cpu') c3.cpuTimer = setTimeout(c3ComputerAnswer, 8100 + Math.random() * 1800);
+  }
+  function c3RenderValues() {
+    [1, 2].forEach((player) => ['x', 'y'].forEach((axis) => {
+      $('c3-value-' + player + '-' + axis).textContent = coordDraftText(c3.values[player][axis]);
+      const button = document.querySelector('[data-c3-axis="' + player + ':' + axis + '"]'), active = c3.active[player] === axis;
+      button.classList.toggle('active', active); button.setAttribute('aria-pressed', String(active));
+    }));
+  }
+  function c3Key(player, key) {
+    if (c3.locked || (player === 2 && c3.mode === 'cpu')) return;
+    sfx.init(); sfx.tap();
+    if (key === 'CHECK') { c3Submit(player); return; }
+    editCoordDraft(c3.values[player], c3.active[player], key); c3RenderValues();
+  }
+  function c3Submit(player) {
+    if (c3.locked || (player === 2 && c3.mode === 'cpu')) return;
+    const values = c3.values[player], x = values.x, y = values.y;
+    if (!x || x === '-' || !y || y === '-') { sfx.nope(); $('c3-status').textContent = 'Player ' + player + ', enter both x and y values.'; return; }
+    if (parseInt(x, 10) !== c3.point.x || parseInt(y, 10) !== c3.point.y) {
+      sfx.nope(); $('c3-status').textContent = (player === 1 ? 'Pip' : 'Freddie') + ' has not found the star yet. Try again!';
+      const pad = $('c3-keys-' + player); restartClass(pad, 'wiggle'); setTimeout(() => pad.classList.remove('wiggle'), 500); return;
+    }
+    claimCoordinateRound(player);
+  }
+  function c3ComputerAnswer() { if (screen === 'c3' && c3.mode === 'cpu' && !c3.locked) claimCoordinateRound(2); }
+  function c3UpdateHearts() {
+    [1, 2].forEach((player) => {
+      const el = $('c3-hearts-' + player);
+      el.innerHTML = [0, 1, 2].map((i) => '<span class="' + (i < c3.hearts[player] ? 'full' : 'spent') + '">' + (i < c3.hearts[player] ? '♥' : '♡') + '</span>').join('');
+      el.setAttribute('aria-label', c3.hearts[player] + ' hearts remaining');
+    });
+  }
+  function claimCoordinateRound(player) {
+    if (c3.locked) return;
+    c3.locked = true; clearTimeout(c3.cpuTimer);
+    const other = player === 1 ? 2 : 1;
+    restartClass($('c3-fighter-' + player), player === 1 ? 'attack-right' : 'attack-left');
+    restartClass($('c3-fighter-' + other), 'got-hit');
+    restartClass($('c3-impact'), 'show');
+    setMood($('c3-char-' + player), 'happy'); setMood($('c3-char-' + other), 'sad');
+    c3.hearts[other] = Math.max(0, c3.hearts[other] - 1); c3UpdateHearts();
+    sfx.correct(); sfx.strike();
+    const names = { 1: 'Pip', 2: 'Freddie' };
+    $('c3-status').textContent = names[player] + ' found ' + coordPair(c3.point) + ' first! ' + names[other] + ' loses a heart.';
+    c3.roundTimer = setTimeout(() => {
+      if (screen !== 'c3') return;
+      if (c3.hearts[other] === 0 || c3.round + 1 >= 8) finishCoordinateBattle();
+      else { c3.round++; c3Load(); }
+    }, 1450);
+  }
+  function finishCoordinateBattle() {
+    clearCoordBattleTimers(); c3.locked = true;
+    const result = c3.hearts[1] === c3.hearts[2] ? 'It’s a draw!' : (c3.hearts[1] > c3.hearts[2] ? 'Pip wins the coordinate battle!' : 'Freddie wins the coordinate battle!');
+    $('c3-result').textContent = result;
+    $('c3-result-detail').textContent = 'Final hearts: Pip ' + c3.hearts[1] + ' · Freddie ' + c3.hearts[2];
+    $('c3-game').hidden = true; $('c3-end').hidden = false; $('c3-status').textContent = result; sfx.fanfare();
+    $('c3-rematch').focus();
+  }
+
+  function makeCoordPad(id, handler) {
+    const box = $(id); box.innerHTML = '';
+    BATTLE_KEYS.forEach((key) => {
+      const btn = document.createElement('button'); btn.type = 'button';
+      btn.className = 'key' + (['DEL', 'CLR'].includes(key) ? ' key-small' : '') + (key === 'CHECK' ? ' key-check' : '') + (key === '0' ? ' key-zero' : '');
+      btn.dataset.coordKey = key; btn.textContent = key === '-' ? '−' : key;
+      box.appendChild(btn);
+    });
+    box.addEventListener('click', (e) => { const btn = e.target.closest('[data-coord-key]'); if (btn) handler(btn.dataset.coordKey); });
+  }
+  function coordinateInit() {
+    const c1Svg = $('c1-plane');
+    mountChar($('c3-char-1'), 'bunny');
+    mountChar($('c3-char-2'), 'frog');
+    c1Svg.addEventListener('click', (e) => {
+      if (c1.stage < 2) {
+        const axisHit = e.target.closest('[data-axis-value]');
+        if (axisHit) c1PickAxis(axisHit.dataset.axis, Number(axisHit.dataset.axisValue));
+        else {
+          const axis = c1.stage === 0 ? 'x' : 'y';
+          $('c1-status').textContent = 'Tap the ' + axis + ' value on the ' + axis + '-axis first.';
+        }
+        return;
+      }
+      const rect = c1Svg.getBoundingClientRect();
+      const viewBox = c1Svg.viewBox.baseVal;
+      const px = viewBox.x + (e.clientX - rect.left) * (viewBox.width / rect.width);
+      const py = viewBox.y + (e.clientY - rect.top) * (viewBox.height / rect.height);
+      const gx = (px - COORD.left) / COORD.unit + COORD.min;
+      const gy = COORD.max - (py - COORD.top) / COORD.unit;
+      if (gx < COORD.min - .5 || gx > COORD.max + .5 || gy < COORD.min - .5 || gy > COORD.max + .5) return;
+      const x = Math.max(COORD.min, Math.min(COORD.max, Math.round(gx))), y = Math.max(COORD.min, Math.min(COORD.max, Math.round(gy)));
+      c1.cursor = { x, y }; c1Select(x, y);
+    });
+    c1Svg.addEventListener('keydown', (e) => {
+      const moves = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, 1], ArrowDown: [0, -1] };
+      if (moves[e.key]) { e.preventDefault(); coordCursorMove(...moves[e.key]); }
+      else if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        if (c1.stage === 0) c1PickAxis('x', c1.cursor.x);
+        else if (c1.stage === 1) c1PickAxis('y', c1.cursor.y);
+        else c1Select(c1.cursor.x, c1.cursor.y);
+      }
+    });
+    makeCoordPad('c2-keys', c2Key);
+    document.querySelectorAll('[data-c2-axis]').forEach((b) => b.addEventListener('click', () => { if (!c2.locked) { if (c2.active !== b.dataset.c2Axis) { const hint = $('c2-axis-hint'); if (hint) hint.remove(); } c2.active = b.dataset.c2Axis; c2RenderValues(); } }));
+    $('c2-hint').addEventListener('click', () => { if (!c2.locked && c2.point) { sfx.init(); sfx.tap(); c2ShowAxisHint(c2.active); } });
+    makeCoordPad('c3-keys-1', (key) => c3Key(1, key));
+    makeCoordPad('c3-keys-2', (key) => c3Key(2, key));
+    document.querySelectorAll('[data-c3-axis]').forEach((b) => b.addEventListener('click', () => { if (!c3.locked) { const parts = b.dataset.c3Axis.split(':'); c3.active[Number(parts[0])] = parts[1]; c3RenderValues(); } }));
+    document.querySelectorAll('[data-cbattle-mode]').forEach((b) => b.addEventListener('click', () => { sfx.init(); sfx.tap(); startCoordinateBattle(b.dataset.cbattleMode); }));
+    $('c3-rematch').addEventListener('click', () => { sfx.init(); sfx.tap(); startCoordinateBattle(c3.mode); });
+    $('c3-change-mode').addEventListener('click', () => { sfx.init(); sfx.tap(); openCoordinate3(); });
+    $('c1-again').addEventListener('click', () => { sfx.init(); sfx.tap(); startCoordinate1(); });
+    $('c2-again').addEventListener('click', () => { sfx.init(); sfx.tap(); startCoordinate2(); });
+    ['c1-home', 'c2-home', 'c3-home'].forEach((id) => $(id).addEventListener('click', () => { clearCoordinateTimers(); showScreen('home'); }));
+    document.addEventListener('keydown', (e) => {
+      if (screen === 'c2' && !c2.locked) {
+        if (/^[0-9]$/.test(e.key)) c2Key(e.key);
+        else if (e.key === '-' || e.key === '−') c2Key('-');
+        else if (e.key === 'Backspace') { e.preventDefault(); c2Key('DEL'); }
+        else if (e.key === 'Escape') c2Key('CLR');
+        else if (e.key === 'Tab') { e.preventDefault(); c2.active = c2.active === 'x' ? 'y' : 'x'; c2RenderValues(); }
+        else if (e.key === 'Enter') { e.preventDefault(); c2Check(); }
+      }
+      if (screen === 'c3' && !c3.locked) {
+        let player = 1, key = null;
+        if (e.code.startsWith('Numpad') && c3.mode === 'pvp') {
+          player = 2;
+          if (/^Numpad[0-9]$/.test(e.code)) key = e.code.slice(-1);
+          else if (e.code === 'NumpadSubtract') key = '-';
+          else if (e.code === 'NumpadEnter') key = 'CHECK';
+          else if (e.code === 'NumpadDecimal') key = 'DEL';
+        } else if (/^[0-9]$/.test(e.key)) key = e.key;
+        else if (e.key === '-' || e.key === '−') key = '-';
+        else if (e.key === 'Backspace') { e.preventDefault(); key = 'DEL'; }
+        else if (e.key === 'Escape') key = 'CLR';
+        else if (e.key === 'Enter') { e.preventDefault(); key = 'CHECK'; }
+        if (key) c3Key(player, key);
+        else if (e.key === 'Tab') { e.preventDefault(); c3.active[player] = c3.active[player] === 'x' ? 'y' : 'x'; c3RenderValues(); }
+      }
+    });
+  }
   /* ================= Finish ================= */
   let lastLevel = 1;
   function finish(level) {
@@ -1994,10 +2616,14 @@
     document.querySelectorAll('[data-sound]').forEach((b) => b.addEventListener('click', () => {
       sfx.muted = !sfx.muted; store.set('nlh-muted', sfx.muted); renderSound(); if (sfx.muted) sfx.stopMusic(); sfx.init(); sfx.tap();
     }));
-    $('tb-home').addEventListener('click', () => { sfx.init(); sfx.tap(); clearTimeout(l2.timer); clearBattleTimers(); closeModal(); showScreen('home'); });
+    $('tb-home').addEventListener('click', () => { sfx.init(); sfx.tap(); clearTimeout(l2.timer); clearBattleTimers(); clearCoordinateTimers(); closeModal(); showScreen('home'); });
     document.querySelectorAll('[data-start]').forEach((b) => b.addEventListener('click', () => {
       sfx.init(); sfx.tap();
       if (b.dataset.start === '1') startLevel1(); else if (b.dataset.start === '2') startLevel2(); else openLevel3();
+    }));
+    document.querySelectorAll('[data-cstart]').forEach((b) => b.addEventListener('click', () => {
+      sfx.init(); sfx.tap();
+      if (b.dataset.cstart === '1') startCoordinate1(); else if (b.dataset.cstart === '2') startCoordinate2(); else openCoordinate3();
     }));
     $('m-again').addEventListener('click', () => { sfx.init(); closeModal(); lastLevel === 1 ? startLevel1() : startLevel2(); });
     $('m-next').addEventListener('click', () => { sfx.init(); closeModal(); startLevel2(); });
@@ -2007,6 +2633,7 @@
     l1Init();
     l2Init();
     l3Init();
+    coordinateInit();
     setInterval(heroHop, 2600);
 
     const d = data || {};
