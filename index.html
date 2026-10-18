@@ -821,9 +821,33 @@
   const sfx = {
     ctx: null,
     muted: store.get('nlh-muted', false),
+    musicTimer: null,
+    musicStep: 0,
     init() {
       if (!this.ctx) { const C = window.AudioContext || window.webkitAudioContext; if (C) { try { this.ctx = new C(); } catch (e) { this.ctx = null; } } }
       if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      if (this.ctx && !this.muted) this.startMusic();
+    },
+    startMusic() {
+      if (this.musicTimer || !this.ctx || this.muted) return;
+      const melody = [659, 0, 784, 988, 784, 0, 698, 784, 0, 523, 659, 784, 1175, 0, 988, 784, 0, 698, 659, 523];
+      const bass = [196, 165, 175, 147, 196];
+      this.musicStep = 0;
+      const tick = () => {
+        if (!this.muted && this.ctx && this.ctx.state === 'running') {
+          const step = this.musicStep;
+          if (melody[step]) this.tone(melody[step], 'triangle', 0.18, 0.035);
+          if (step % 4 === 0) this.tone(bass[Math.floor(step / 4) % bass.length], 'sine', 0.34, 0.018);
+          if (step === 7 || step === 19) this.tone(step === 7 ? 240 : 300, 'triangle', 0.22, 0.03, step === 7 ? 520 : 130);
+        }
+        this.musicStep = (this.musicStep + 1) % melody.length;
+      };
+      tick();
+      this.musicTimer = setInterval(tick, 240);
+    },
+    stopMusic() {
+      clearInterval(this.musicTimer);
+      this.musicTimer = null;
     },
     tone(f, type = 'sine', dur = 0.15, vol = 0.16, f2 = null, delay = 0) {
       if (this.muted || !this.ctx) return;
@@ -1074,7 +1098,7 @@
   const L1_YAY = ['Hop-tastic!', 'Bunny-believable!', 'Carrot-tastic!', 'Ear-resistible work!', 'Some-bunny is a superstar!'];
   const L1_OOPS = ['Oopsie, wrong burrow!', 'Boing… my ears are spinning!', 'Whoops, I got lost!', 'Uh-oh, that was not the carrot patch!'];
 
-  let l1 = { idx: 0, correct: 0, results: [], busy: false, bunnyAt: 0, hint: false };
+  let l1 = { questions: [], idx: 0, correct: 0, results: [], busy: false, bunnyAt: 0, hint: false };
 
   function arrowPoints(len) {
     const dir = Math.sign(len) || 1, L = Math.abs(len);
@@ -1135,15 +1159,16 @@
   }
 
   function startLevel1(resume) {
-    const r = resume && resume.idx < 10 ? resume : null;
-    l1 = { idx: r ? r.idx : 0, correct: r ? r.correct : 0, results: r ? r.results : [], busy: false, bunnyAt: l1.bunnyAt || 0, hint: false };
+    const r = resume && resume.idx < L1Q.length ? resume : null;
+    const questions = r && Array.isArray(r.questions) && r.questions.length === L1Q.length ? r.questions : (r ? L1Q : shuffle(L1Q));
+    l1 = { questions, idx: r ? r.idx : 0, correct: r ? r.correct : 0, results: r ? r.results : [], busy: false, bunnyAt: l1.bunnyAt || 0, hint: false };
     showScreen('l1');
     l1Load();
   }
 
   async function l1Load() {
     l1.busy = true;
-    const q = L1Q[l1.idx];
+    const q = l1.questions[l1.idx];
     setTop(1, l1.idx, l1.correct);
     $('l1-target').textContent = signed(q.target);
     l1HideHint();
@@ -1246,7 +1271,7 @@
     if (l1.busy || l1.hint) return;
     sfx.init(); sfx.tap();
     l1.hint = true;
-    const t = L1Q[l1.idx].target, n = Math.abs(t), side = t > 0 ? 'right' : 'left', colour = t > 0 ? 'green' : 'blue';
+    const t = l1.questions[l1.idx].target, n = Math.abs(t), side = t > 0 ? 'right' : 'left', colour = t > 0 ? 'green' : 'blue';
     const h = $('l1-hint');
     h.innerHTML = `<b>${signed(t)}</b> is <b>${n} ${units(n)}</b> to the <b>${side.toUpperCase()}</b> of 0. Look for the ${colour} arrow pointing ${side} that is ${n} ${units(n)} long. Its tip will land on the glowing circle.`;
     h.hidden = false;
@@ -1299,7 +1324,7 @@
     sfx.init();
     $('l1-hint-btn').disabled = true;
     document.querySelectorAll('#l1-options .opt-card').forEach((c) => c.classList.toggle('chosen', Number(c.dataset.value) === val));
-    const q = L1Q[l1.idx], ok = val === q.target, n = Math.abs(q.target), side = q.target > 0 ? 'right' : 'left';
+    const q = l1.questions[l1.idx], ok = val === q.target, n = Math.abs(q.target), side = q.target > 0 ? 'right' : 'left';
     follow($('l1-scroll'), $('l1-svg'), 0, L1.vbW, x1(val / 2));
     say('l1-bubble', `Wheee! Hopping ${Math.abs(val)} ${units(Math.abs(val))} to the ${val > 0 ? 'right' : 'left'}…`);
     await l1HopVector(val);
@@ -1327,7 +1352,7 @@
     await sleep(ok ? 2200 : 3600);
     if (screen !== 'l1') return;
     l1.idx++;
-    if (l1.idx < L1Q.length) l1Load(); else finish(1);
+    if (l1.idx < l1.questions.length) l1Load(); else finish(1);
   }
 
   /* ================= LEVEL 2 ================= */
@@ -1351,7 +1376,7 @@
   const L2_OOPS = ['Splash! I missed the lily pad.', 'Croak… not quite!', 'Oops, I fell in the pond!', 'Ribbit? That does not look right.'];
   const T1 = '<i class="tagtxt t1">Term 1</i>', T2 = '<i class="tagtxt t2">Term 2</i>';
 
-  let l2 = { idx: 0, correct: 0, results: [], step: 1, typed: '', v1: null, v2: null, locked: false, busy: false, timer: null, frogAt: 0, hl: store.get('nlh-hl', false) };
+  let l2 = { questions: [], idx: 0, correct: 0, results: [], step: 1, typed: '', v1: null, v2: null, locked: false, busy: false, timer: null, frogAt: 0, hl: store.get('nlh-hl', false) };
 
   function l2Init() {
     buildAxis($('l2-axis'), { min: L2.min, max: L2.max, toX: x2, axisY: L2.axisY, labelY: L2.labelY, major: 5 });
@@ -1412,9 +1437,10 @@
   }
 
   function startLevel2(resume) {
-    const r = resume && resume.idx < 10 ? resume : null;
+    const r = resume && resume.idx < L2Q.length ? resume : null;
+    const questions = r && Array.isArray(r.questions) && r.questions.length === L2Q.length ? r.questions : (r ? L2Q : shuffle(L2Q));
     clearTimeout(l2.timer);
-    Object.assign(l2, { idx: r ? r.idx : 0, correct: r ? r.correct : 0, results: r ? r.results : [], locked: false, busy: false });
+    Object.assign(l2, { questions, idx: r ? r.idx : 0, correct: r ? r.correct : 0, results: r ? r.results : [], locked: false, busy: false });
     showScreen('l2');
     l2Load();
   }
@@ -1422,7 +1448,7 @@
   async function l2Load() {
     clearTimeout(l2.timer);
     l2.locked = false; l2.busy = true;
-    const q = L2Q[l2.idx];
+    const q = l2.questions[l2.idx];
     renderEquation(q);
     setTop(2, l2.idx, l2.correct);
     $('l2-next').hidden = true;
@@ -1673,7 +1699,7 @@
     sfx.init();
     if (l2.step < 3) { sfx.nope(); toast('Place both arrows on the number line first.'); return; }
     if (l2.typed === '' || l2.typed === '-') { sfx.nope(); toast('Type your answer with the keypad first.'); return; }
-    const q = L2Q[l2.idx], ans = q.term1 + q.term2, val = parseInt(l2.typed, 10);
+    const q = l2.questions[l2.idx], ans = q.term1 + q.term2, val = parseInt(l2.typed, 10);
     const vecOk = l2.v1.correct && l2.v2.correct, ansOk = val === ans, ok = vecOk && ansOk;
     l2.locked = true;
     l2.results.push({ q, val, ans, ok, vecOk });
@@ -1708,11 +1734,11 @@
     clearTimeout(l2.timer);
     if (screen !== 'l2') return;
     l2.idx++;
-    if (l2.idx < L2Q.length) l2Load(); else finish(2);
+    if (l2.idx < l2.questions.length) l2Load(); else finish(2);
   }
 
   /* ================= LEVEL 3: Number Line Battle ================= */
-  let l3 = { mode: null, idx: 0, typed: { 1: '', 2: '' }, hearts: { 1: 3, 2: 3 }, locked: false, cpuTimer: null, roundTimer: null };
+  let l3 = { questions: [], mode: null, idx: 0, typed: { 1: '', 2: '' }, hearts: { 1: 3, 2: 3 }, locked: false, cpuTimer: null, roundTimer: null };
   const BATTLE_KEYS = ['1', '2', '3', 'DEL', '4', '5', '6', 'CLR', '7', '8', '9', '-', '0', 'CHECK'];
   function clearBattleTimers() { clearTimeout(l3.cpuTimer); clearTimeout(l3.roundTimer); l3.cpuTimer = null; l3.roundTimer = null; }
 
@@ -1731,7 +1757,7 @@
 
   function startBattle(mode) {
     clearBattleTimers();
-    Object.assign(l3, { mode, idx: 0, typed: { 1: '', 2: '' }, hearts: { 1: 3, 2: 3 }, locked: false });
+    Object.assign(l3, { questions: shuffle(L2Q), mode, idx: 0, typed: { 1: '', 2: '' }, hearts: { 1: 3, 2: 3 }, locked: false });
     $('l3-mode-choice').hidden = true;
     $('l3-game').hidden = false;
     $('l3-pad-2').hidden = mode === 'cpu';
@@ -1766,15 +1792,15 @@
   function setBattleTop() {
     $('tb-level').textContent = 'Level 3';
     $('tb-name').textContent = 'Number Line Battle';
-    $('tb-q').textContent = `Round ${l3.idx + 1} of ${L2Q.length}`;
-    $('tb-bar').style.width = `${((l3.idx + 1) / L2Q.length) * 100}%`;
+    $('tb-q').textContent = `Round ${l3.idx + 1} of ${l3.questions.length}`;
+    $('tb-bar').style.width = `${((l3.idx + 1) / l3.questions.length) * 100}%`;
     $('tb-count').hidden = true;
-    $('l3-round-label').textContent = `Question ${l3.idx + 1} of ${L2Q.length} · Solve as fast as you can`;
+    $('l3-round-label').textContent = `Question ${l3.idx + 1} of ${l3.questions.length} · Solve as fast as you can`;
   }
 
   function l3Load() {
     clearTimeout(l3.cpuTimer);
-    const q = L2Q[l3.idx];
+    const q = l3.questions[l3.idx];
     if (!q) { finishBattle(); return; }
     l3.locked = false;
     l3.typed = { 1: '', 2: '' };
@@ -1786,7 +1812,7 @@
     $('l3-status').textContent = 'Type the answer on your number pad!';
     ['l3-fighter-1', 'l3-fighter-2'].forEach((id) => $(id).classList.remove('attack-right', 'attack-left', 'got-hit'));
     setMood($('l3-char-1'), null); setMood($('l3-char-2'), null);
-    if (l3.mode === 'cpu') l3.cpuTimer = setTimeout(l3ComputerAnswer, 4100 + Math.random() * 1800);
+    if (l3.mode === 'cpu') l3.cpuTimer = setTimeout(l3ComputerAnswer, 8100 + Math.random() * 1800);
   }
 
   function l3Key(player, key) {
@@ -1807,7 +1833,7 @@
     if (screen !== 'l3' || l3.mode == null || l3.locked || (player === 2 && l3.mode === 'cpu')) return;
     const val = l3.typed[player];
     if (val === '' || val === '-') { sfx.init(); sfx.nope(); $('l3-status').textContent = `Player ${player}, type an answer first!`; return; }
-    const answer = L2Q[l3.idx].term1 + L2Q[l3.idx].term2;
+    const answer = l3.questions[l3.idx].term1 + l3.questions[l3.idx].term2;
     if (parseInt(val, 10) === answer) { claimBattleRound(player); return; }
     sfx.init(); sfx.nope();
     const who = player === 1 ? 'Pip' : 'Freddie';
@@ -1847,7 +1873,7 @@
     $('l3-status').textContent = `${names[player]} answered first! ${names[other]} loses a heart.`;
     l3.roundTimer = setTimeout(() => {
       if (screen !== 'l3') return;
-      if (l3.hearts[other] === 0 || l3.idx + 1 >= L2Q.length) finishBattle();
+      if (l3.hearts[other] === 0 || l3.idx + 1 >= l3.questions.length) finishBattle();
       else { l3.idx++; l3Load(); }
     }, 1500);
   }
@@ -1954,8 +1980,8 @@
       if (window.claude && window.claude.hot && typeof window.claude.hot.snapshot === 'function') {
         window.claude.hot.snapshot(() => ({
           screen,
-          l1: { idx: l1.idx, correct: l1.correct, results: l1.results },
-          l2: { idx: l2.idx, correct: l2.correct, results: l2.results }
+          l1: { questions: l1.questions, idx: l1.idx, correct: l1.correct, results: l1.results },
+          l2: { questions: l2.questions, idx: l2.idx, correct: l2.correct, results: l2.results }
         }));
       }
     } catch (e) { /* not in a viewer */ }
@@ -1966,7 +1992,7 @@
     renderSound();
     $('tb-home').innerHTML = ICON.home;
     document.querySelectorAll('[data-sound]').forEach((b) => b.addEventListener('click', () => {
-      sfx.muted = !sfx.muted; store.set('nlh-muted', sfx.muted); renderSound(); sfx.init(); sfx.tap();
+      sfx.muted = !sfx.muted; store.set('nlh-muted', sfx.muted); renderSound(); if (sfx.muted) sfx.stopMusic(); sfx.init(); sfx.tap();
     }));
     $('tb-home').addEventListener('click', () => { sfx.init(); sfx.tap(); clearTimeout(l2.timer); clearBattleTimers(); closeModal(); showScreen('home'); });
     document.querySelectorAll('[data-start]').forEach((b) => b.addEventListener('click', () => {
