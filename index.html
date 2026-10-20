@@ -558,7 +558,7 @@
   .coord-prompt { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
   .coord-prompt h2 { margin: 2px 0 4px; font-family: var(--display); font-size: clamp(1.25rem, 4vw, 1.8rem); }
   .coord-target { margin: 0; color: var(--accent-text); font: 700 clamp(2rem, 7vw, 3rem) var(--display); font-variant-numeric: tabular-nums; }
-  .coord-punctuation { color: #fff; }
+  .coord-punctuation { color: var(--text); }
   .coord-x-value { color: var(--bad); }
   .coord-y-value { color: var(--good); }
   .coord-reward-counts { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; }
@@ -1635,6 +1635,7 @@
     snapshot();
   }
 
+  const L2_CARD_UNIT = 8;
   function l2BuildCards(q) {
     const s1 = Math.sign(q.term1), s2 = Math.sign(q.term2);
     const opts = shuffle([
@@ -1651,7 +1652,9 @@
       card.className = 'l2-card';
       card.dataset.term = opt.term;
       card.setAttribute('aria-label', `Term ${opt.term} arrow, ${opt.mag} ${units(opt.mag)} to the ${opt.dir > 0 ? 'right' : 'left'}`);
-      const pts = straightArrowPoints(opt.dir > 0 ? 6 : 126, opt.dir > 0 ? 126 : 6, 15, { thick: 11, head: 24, headHalf: 13 });
+      // Draw every card on one shared scale (8 px per unit, 15 units = full width) so lengths compare honestly.
+      const span = Math.min(opt.mag, 15) * L2_CARD_UNIT, left = 66 - span / 2, right = 66 + span / 2;
+      const pts = straightArrowPoints(opt.dir > 0 ? left : right, opt.dir > 0 ? right : left, 15, { thick: 11, head: 24, headHalf: 13 });
       card.innerHTML = `<span class="tag t${opt.term}">Term ${opt.term}</span>
         <svg class="card-arrow ${opt.dir > 0 ? 'vec-pos' : 'vec-neg'}" viewBox="0 0 132 30" aria-hidden="true"><polygon class="vec-shape" points="${pts}"/></svg>
         <span class="opt-label ${opt.dir > 0 ? 'vec-pos' : 'vec-neg'}" style="color:${opt.dir > 0 ? 'var(--right)' : 'var(--left)'}">${opt.mag} ${units(opt.mag)}</span>`;
